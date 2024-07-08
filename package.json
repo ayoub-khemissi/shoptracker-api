@@ -1,0 +1,25 @@
+{
+  "name": "shoptracker-api",
+  "version": "1.0.0",
+  "description": "ShopTracker API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon --env-file=.env index.js"
+  },
+  "keywords": [],
+  "author": "PrimeCode",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.48.0",
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "console-stamp": "^3.1.2",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "google-auth-library": "^9.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.10.2"
+  }
+}
