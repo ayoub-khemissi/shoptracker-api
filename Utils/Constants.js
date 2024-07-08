@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-undef
 const {
     SHOPTRACKER_API_PORT,
     SHOPTRACKER_API_HOSTNAME,
@@ -11,6 +10,7 @@ const {
     SHOPTRACKER_DB_PASSWORD,
     SHOPTRACKER_DB_DATABASE,
     STRIPE_API_KEY,
+// eslint-disable-next-line no-undef
 } = process.env;
 
 const Constants = {

@@ -15,7 +15,7 @@ api.post("/login/classical", async function (req, res) {
     }
 
     const valuesA = [email];
-    const queryA = `SELECT * FROM user WHERE email=?`;
+    const queryA = "SELECT * FROM user WHERE email=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length === 0) {

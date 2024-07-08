@@ -26,13 +26,13 @@ api.post("/login/google", async function (req, res) {
     }
 
     const valuesA = [email];
-    const queryA = `SELECT * FROM user WHERE email=?`;
+    const queryA = "SELECT * FROM user WHERE email=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     let data = null;
     if (resultA.length === 0) {
         const valuesB = [email, firstname, photo, true, true, true, true, Date.now()];
-        const queryB = `INSERT INTO user (email, firstname, photo, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const queryB = "INSERT INTO user (email, firstname, photo, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         const [resultB] = await Database.execute(queryB, valuesB);
 
         if (resultB.length === 0) {
@@ -41,7 +41,7 @@ api.post("/login/google", async function (req, res) {
         }
 
         const valuesC = [resultB.insertId];
-        const queryC = `SELECT * FROM user WHERE id = ?`;
+        const queryC = "SELECT * FROM user WHERE id = ?";
         const [resultC] = await Database.execute(queryC, valuesC);
 
         if (resultC.length === 0) {

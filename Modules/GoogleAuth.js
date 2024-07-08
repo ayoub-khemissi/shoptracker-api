@@ -1,5 +1,5 @@
-import { OAuth2Client } from 'google-auth-library';
-import Constants from '../Utils/Constants.js';
+import { OAuth2Client } from "google-auth-library";
+import Constants from "../Utils/Constants.js";
 
 const { googleSignWebClientId } = Constants;
 
