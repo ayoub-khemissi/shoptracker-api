@@ -1,4 +1,5 @@
 import api from "../Modules/Api.js";
+import { signAuthJwt } from "../Modules/Auth.js";
 import { hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
 import { clearSensitiveData, validateEmail, validateHash512 } from "../Modules/DataValidation.js";
@@ -32,7 +33,7 @@ api.post("/login/classical", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData(resultA[0]);
+    const data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }) });
 
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });

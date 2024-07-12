@@ -46,7 +46,7 @@ api.post("/register/classical", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email }) });
+    const data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }) });
 
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

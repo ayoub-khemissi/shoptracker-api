@@ -31,7 +31,7 @@ api.post("/register/google", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length > 0) {
-        const data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email }) });
+        const data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }) });
         res.status(200).json({ data: data, msg: "User successfully logged in." });
         return;
     }
@@ -54,7 +54,7 @@ api.post("/register/google", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email }) });
+    const data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }) });
 
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

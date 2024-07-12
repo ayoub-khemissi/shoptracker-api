@@ -1,4 +1,5 @@
 import api from "../Modules/Api.js";
+import { signAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { cleanData, clearSensitiveData, validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
@@ -49,9 +50,9 @@ api.post("/login/google", async function (req, res) {
             return;
         }
 
-        data = clearSensitiveData(resultC[0]);
+        data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }) });
     } else {
-        data = clearSensitiveData(resultA[0]);
+        data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }) });
     }
 
     res.status(200).json({ data: data, msg: "User successfully logged in." });

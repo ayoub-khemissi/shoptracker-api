@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
-import Constants from "../Utils/Constants.js";
+import Config from "../Utils/Config.js";
 
-const { apiJwtSecret } = Constants;
+const { apiJwtSecret } = Config;
 
 export function verifyAuthJwt(authJwt) {
     try {
-        return !!jwt.verify(authJwt, apiJwtSecret);
+        return jwt.verify(authJwt, apiJwtSecret);
     } catch (error) {
         return false;
     }
@@ -13,8 +13,22 @@ export function verifyAuthJwt(authJwt) {
 
 export function signAuthJwt(authPayload) {
     try {
-        return jwt.sign(authPayload, apiJwtSecret);
+        return jwt.sign(authPayload, apiJwtSecret, { algorithm: "HS512", expiresIn: "30 days" });
     } catch (error) {
         return null;
     }
+}
+
+export function extractJwt(authorizationHeader) {
+    if (!authorizationHeader) {
+        return null;
+    }
+
+    const parts = authorizationHeader.split(" ");
+
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
+        return null;
+    }
+
+    return parts[1];
 }
