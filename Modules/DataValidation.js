@@ -14,8 +14,16 @@ export function validateHash512(hash) {
 }
 
 export function validateUrl(url) {
-    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+)(:\d+)?(\/[^\s]*)?$/;
+    const urlRegex = /^(http(s):\/\/.)[-a-zA-Z0-9@:%._\\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$/;
     return urlRegex.test(url);
+}
+
+export function validateBoolean(data) {
+    return typeof data === "boolean";
+}
+
+export function validateNumber(data) {
+    return typeof data === "number";
 }
 
 export function cleanData(data) {
