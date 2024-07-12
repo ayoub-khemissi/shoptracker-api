@@ -1,7 +1,7 @@
 import { OAuth2Client } from "google-auth-library";
-import Constants from "../Utils/Constants.js";
+import Config from "../Utils/Config.js";
 
-const { googleSignWebClientId } = Constants;
+const { googleSignWebClientId } = Config;
 
 const client = new OAuth2Client(googleSignWebClientId);
 

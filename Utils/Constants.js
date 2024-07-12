@@ -1,30 +1,9 @@
-const {
-    SHOPTRACKER_API_PORT,
-    SHOPTRACKER_API_HOSTNAME,
-    SHOPTRACKER_API_HTTPSECURE,
-    SHOPTRACKER_API_JWT_SECRET,
-    SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID,
-    SHOPTRACKER_DB_HOST,
-    SHOPTRACKER_DB_PORT,
-    SHOPTRACKER_DB_USER,
-    SHOPTRACKER_DB_PASSWORD,
-    SHOPTRACKER_DB_DATABASE,
-    STRIPE_API_KEY,
-// eslint-disable-next-line no-undef
-} = process.env;
-
 const Constants = {
-    apiPort: SHOPTRACKER_API_PORT,
-    apiHostname: SHOPTRACKER_API_HOSTNAME,
-    apiHttpSecure: String(SHOPTRACKER_API_HTTPSECURE) === "1" || String(SHOPTRACKER_API_HTTPSECURE) === "true",
-    apiJwtSecret: SHOPTRACKER_API_JWT_SECRET,
-    googleSignWebClientId: SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID,
-    dbHost: SHOPTRACKER_DB_HOST,
-    dbPort: SHOPTRACKER_DB_PORT,
-    dbUser: SHOPTRACKER_DB_USER,
-    dbPassword: SHOPTRACKER_DB_PASSWORD,
-    dbDatabase: SHOPTRACKER_DB_DATABASE,
-    stripeApiKey: STRIPE_API_KEY,
+    trackStatusActive: 1,
+    trackStatusDisabled: 2,
+
+    trackCheckOk: 1,
+    trackCheckKo: 2,
 };
 
 export default Constants;

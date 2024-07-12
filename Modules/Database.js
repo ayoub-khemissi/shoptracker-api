@@ -1,7 +1,7 @@
 import mysql from "mysql2";
-import Constants from "../Utils/Constants.js";
+import Config from "../Utils/Config.js";
 
-const { dbHost, dbPort, dbUser, dbPassword, dbDatabase } = Constants;
+const { dbHost, dbPort, dbUser, dbPassword, dbDatabase } = Config;
 
 const pool = mysql.createPool({
     host: dbHost,

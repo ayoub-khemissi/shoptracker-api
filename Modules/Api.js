@@ -1,12 +1,12 @@
 import consoleStamp from "console-stamp";
 import express from "express";
 import { readFileSync } from "fs";
-import Constants from "../Utils/Constants.js";
+import Config from "../Utils/Config.js";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
 const api = express();
-const { apiHttpSecure, apiHostname, apiPort } = Constants;
+const { apiHttpSecure, apiHostname, apiPort } = Config;
 const { version, description } = JSON.parse(readFileSync("package.json"));
 
 api.use(express.json());
