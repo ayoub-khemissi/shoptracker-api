@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import Config from "../Utils/Config.js";
+import Log from "./Log.js";
 
 const { stripeApiKey } = Config;
 
@@ -17,7 +18,7 @@ export async function createPaymentMethod(cardNumber, expMonth, expYear, cvc) {
             },
         });
     } catch (error) {
-        console.error("@Stripe:createPaymentMethod - an error occured: ", error);
+        Log.error("@Stripe:createPaymentMethod - an error occurred: " + error);
         return null;
     }
 }
@@ -39,7 +40,7 @@ export async function createCustomer(email, paymentMethodId, firstname, lastname
             },
         });
     } catch (error) {
-        console.error("@Stripe:createCustomer - an error occured: ", error);
+        Log.error("@Stripe:createCustomer - an error occurred: " + error);
         return null;
     }
 }
@@ -52,7 +53,7 @@ export async function createSubscription(customerId, priceId) {
             expand: ["latest_invoice.payment_intent"],
         });
     } catch (error) {
-        console.error("@Stripe:createSubscription - an error occured: ", error);
+        Log.error("@Stripe:createSubscription - an error occurred: " + error);
         return null;
     }
 }
@@ -68,7 +69,7 @@ export async function createPrice(productId, unitAmount, currency) {
             product: productId,
         });
     } catch (error) {
-        console.error("@Stripe:createPrice - an error occured: ", error);
+        Log.error("@Stripe:createPrice - an error occurred: " + error);
         return null;
     }
 }
@@ -80,7 +81,7 @@ export async function createRefund(paymentIntentId, amount) {
             amount,
         });
     } catch (error) {
-        console.error("@Stripe:createRefund - an error occured: ", error);
+        Log.error("@Stripe:createRefund - an error occurred: " + error);
         return null;
     }
 }
@@ -89,7 +90,7 @@ export async function cancelSubscription(subscriptionId) {
     try {
         return stripe.subscriptions.cancel(subscriptionId);
     } catch (error) {
-        console.error("@Stripe:cancelSubscription - an error occured: ", error);
+        Log.error("@Stripe:cancelSubscription - an error occurred: " + error);
         return null;
     }
 }
@@ -105,7 +106,7 @@ export async function updatePaymentMethod(paymentMethodId, cardNumber, expMonth,
             },
         });
     } catch (error) {
-        console.error("@Stripe:updatePaymentMethod - an error occured: ", error);
+        Log.error("@Stripe:updatePaymentMethod - an error occurred: " + error);
         return null;
     }
 }
@@ -118,7 +119,7 @@ export async function retrieveCustomer(customerId) {
     try {
         return await stripe.customers.retrieve(customerId);
     } catch (error) {
-        console.error("@Stripe:retrieveCustomer - an error occured: ", error);
+        Log.error("@Stripe:retrieveCustomer - an error occurred: " + error);
         return null;
     }
 }
@@ -127,7 +128,7 @@ export async function retrievePaymentMethod(paymentMethodId) {
     try {
         return await stripe.paymentMethods.retrieve(paymentMethodId);
     } catch (error) {
-        console.error("@Stripe:retrievePaymentMethod - an error occured: ", error);
+        Log.error("@Stripe:retrievePaymentMethod - an error occurred: " + error);
         return null;
     }
 }
@@ -138,7 +139,7 @@ export async function retrieveInvoice(invoiceId) {
             expand: ["payment_intent"],
         });
     } catch (error) {
-        console.error("@Stripe:retrieveInvoice - an error occured: ", error);
+        Log.error("@Stripe:retrieveInvoice - an error occurred: " + error);
         return null;
     }
 }
@@ -149,7 +150,7 @@ export async function retrieveSubscription(subscriptionId) {
             expand: ["latest_invoice.payment_intent"],
         });
     } catch (error) {
-        console.error("@Stripe:retrieveSubscription - an error occured: ", error);
+        Log.error("@Stripe:retrieveSubscription - an error occurred: " + error);
         return null;
     }
 }
@@ -160,7 +161,7 @@ export async function listCustomerSubscriptions(customerId) {
             customer: customerId,
         });
     } catch (error) {
-        console.error("@Stripe:listCustomerSubscriptions - an error occured: ", error);
+        Log.error("@Stripe:listCustomerSubscriptions - an error occurred: " + error);
         return null;
     }
 }
