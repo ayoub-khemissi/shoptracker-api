@@ -36,7 +36,7 @@ api.post("/login/google", async function (req, res) {
         const queryB = "INSERT INTO user (email, firstname, photo, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         const [resultB] = await Database.execute(queryB, valuesB);
 
-        if (resultB.length === 0) {
+        if (resultB.affectedRows === 0) {
             res.status(400).json({ data: null, msg: "User not inserted." });
             return;
         }
