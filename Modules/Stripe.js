@@ -124,6 +124,20 @@ export async function retrieveCustomer(customerId) {
     }
 }
 
+export async function updateSubscription(subscriptionId, newPriceId) {
+    try {
+        return await stripe.subscriptions.update(subscriptionId, {
+            items: [{
+                id: subscriptionId,
+                price: newPriceId,
+            }],
+        });
+    } catch (error) {
+        Log.error("@Stripe:updateSubscription - an error occurred: " + error);
+        return null;
+    }
+}
+
 export async function retrievePaymentMethod(paymentMethodId) {
     try {
         return await stripe.paymentMethods.retrieve(paymentMethodId);
