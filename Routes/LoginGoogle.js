@@ -11,19 +11,23 @@ api.post("/login/google", async function (req, res) {
     const googleJwt = cleanData(req.body.googleJwt);
 
     if (!validateEmail(email)) {
-        return res.status(400).json({ data: null, msg: "Invalid email format." });
+        res.status(400).json({ data: null, msg: "Invalid email format." });
+        return;
     }
 
     if (!validateName(firstname)) {
-        return res.status(400).json({ data: null, msg: "Invalid firstname format." });
+         res.status(400).json({ data: null, msg: "Invalid firstname format." });
+         return;
     }
 
     if (!validateUrl(photo)) {
-        return res.status(400).json({ data: null, msg: "Invalid photo format." });
+        res.status(400).json({ data: null, msg: "Invalid photo format." });
+        return;
     }
 
     if (!await verifyGoogleJwt(googleJwt)) {
-        return res.status(401).json({ data: null, msg: "Invalid Google JWT." });
+        res.status(401).json({ data: null, msg: "Invalid Google JWT." });
+        return;
     }
 
     const valuesA = [email];

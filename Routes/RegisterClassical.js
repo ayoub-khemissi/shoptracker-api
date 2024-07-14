@@ -9,11 +9,13 @@ api.post("/register/classical", async function (req, res) {
     const password = cleanData(req.body.password);
 
     if (!validateEmail(email)) {
-        return res.status(400).json({ data: null, msg: "Invalid email format." });
+        res.status(400).json({ data: null, msg: "Invalid email format." });
+        return;
     }
 
     if (!validateHash512(password)) {
-        return res.status(400).json({ data: null, msg: "Invalid password format." });
+        res.status(400).json({ data: null, msg: "Invalid password format." });
+        return;
     }
 
     const valuesA = [email];

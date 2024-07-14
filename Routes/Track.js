@@ -23,23 +23,28 @@ api.post("/track", async function (req, res) {
     const trackStatus = req.body.trackStatus;
 
     if (!validateUrl(url)) {
-        return res.status(400).json({ data: null, msg: "Invalid url format." });
+        res.status(400).json({ data: null, msg: "Invalid url format." });
+        return;
     }
 
     if (!validateBoolean(trackStock)) {
-        return res.status(400).json({ data: null, msg: "Invalid trackStock format." });
+        res.status(400).json({ data: null, msg: "Invalid trackStock format." });
+        return;
     }
 
     if (!validateBoolean(trackPrice)) {
-        return res.status(400).json({ data: null, msg: "Invalid trackPrice format." });
+        res.status(400).json({ data: null, msg: "Invalid trackPrice format." });
+        return;
     }
 
     if (trackPrice && !validateNumber(trackPriceThreshold)) {
-        return res.status(400).json({ data: null, msg: "Invalid trackPriceThreshold format." });
+        res.status(400).json({ data: null, msg: "Invalid trackPriceThreshold format." });
+        return;
     }
 
     if (!validateTrackStatus(trackStatus)) {
-        return res.status(400).json({ data: null, msg: "Invalid trackStatus format." });
+        res.status(400).json({ data: null, msg: "Invalid trackStatus format." });
+        return;
     }
 
     const valuesA = [jwt.id, trackStatus];
