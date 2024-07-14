@@ -4,7 +4,7 @@ import Database from "../Modules/Database.js";
 import { cleanData, validateBoolean, validateUrl } from "../Modules/DataValidation.js";
 import Constants from "../Utils/Constants.js";
 
-const { trackStatusActive } = Constants;
+const { trackStatusEnabled } = Constants;
 
 api.post("/track", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));  
@@ -31,7 +31,7 @@ api.post("/track", async function (req, res) {
         return res.status(400).json({ data: null, msg: "Invalid trackPrice format." });
     }
 
-    const valuesA = [jwt.id, url, additionalInfo, trackStock, trackPrice, trackStatusActive, Date.now()];
+    const valuesA = [jwt.id, url, additionalInfo, trackStock, trackPrice, trackStatusEnabled, Date.now()];
     const queryA = "INSERT INTO track (user_id, url, additional_info, track_stock, track_price, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
     await Database.execute(queryA, valuesA);
 

@@ -1,6 +1,7 @@
 const Constants = {
-    trackStatusActive: 1,
+    trackStatusEnabled: 1,
     trackStatusDisabled: 2,
+    trackStatusInvalid: 3,
 
     trackCheckOk: 1,
     trackCheckKo: 2,
