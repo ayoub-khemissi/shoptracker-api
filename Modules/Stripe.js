@@ -95,6 +95,17 @@ export async function cancelSubscription(subscriptionId) {
     }
 }
 
+export async function cancelSubscriptionAtPeriodEnd(subscriptionId) {
+    try {
+        return await stripe.subscriptions.update(subscriptionId, {
+            cancel_at_period_end: true,
+        });
+    } catch (error) {
+        Log.error("@Stripe:cancelSubscriptionAtPeriodEnd - an error occurred: " + error);
+        return null;
+    }
+}
+
 export async function updatePaymentMethod(paymentMethodId, cardNumber, expMonth, expYear, cvc) {
     try {
         return stripe.paymentMethods.update(paymentMethodId, {
