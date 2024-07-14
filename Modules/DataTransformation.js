@@ -1,5 +1,5 @@
 export function cleanData(data) {
-    if (!data) { return null; }
+    if (!data || typeof data !== "string" || data.length === 0) { return null; }
 
     return String(data).trim();
 }
