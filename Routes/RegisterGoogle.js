@@ -1,7 +1,9 @@
 import api from "../Modules/Api.js";
 import { signAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { cleanData, clearSensitiveData, validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
+import { validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
+import { cleanData, clearSensitiveData } from "../Modules/DataTransformation.js";
+
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 
 api.post("/register/google", async function (req, res) {

@@ -1,7 +1,8 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { cleanData, validateBoolean, validateNumber, validateTrackStatus, validateUrl } from "../Modules/DataValidation.js";
+import { validateBoolean, validateNumber, validateTrackStatus, validateUrl } from "../Modules/DataValidation.js";
+import { cleanData } from "../Modules/DataTransformation.js";
 import { retrieveSubscription } from "../Modules/Stripe.js";
 import Constants from "../Utils/Constants.js";
 

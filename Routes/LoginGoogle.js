@@ -1,7 +1,8 @@
 import api from "../Modules/Api.js";
 import { signAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { cleanData, clearSensitiveData, validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
+import { validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
+import { cleanData, clearSensitiveData } from "../Modules/DataTransformation.js";
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 
 api.post("/login/google", async function (req, res) {
@@ -16,8 +17,8 @@ api.post("/login/google", async function (req, res) {
     }
 
     if (!validateName(firstname)) {
-         res.status(400).json({ data: null, msg: "Invalid firstname format." });
-         return;
+        res.status(400).json({ data: null, msg: "Invalid firstname format." });
+        return;
     }
 
     if (!validateUrl(photo)) {

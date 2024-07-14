@@ -2,7 +2,8 @@ import api from "../Modules/Api.js";
 import { signAuthJwt } from "../Modules/Auth.js";
 import { generateSalt, hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
-import { cleanData, clearSensitiveData, validateEmail, validateHash512 } from "../Modules/DataValidation.js";
+import { validateEmail, validateHash512 } from "../Modules/DataValidation.js";
+import { cleanData, clearSensitiveData } from "../Modules/DataTransformation.js";
 
 api.post("/register/classical", async function (req, res) {
     const email = cleanData(req.body.email);

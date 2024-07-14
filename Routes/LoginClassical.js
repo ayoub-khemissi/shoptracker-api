@@ -2,7 +2,8 @@ import api from "../Modules/Api.js";
 import { signAuthJwt } from "../Modules/Auth.js";
 import { hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
-import { clearSensitiveData, validateEmail, validateHash512 } from "../Modules/DataValidation.js";
+import { validateEmail, validateHash512 } from "../Modules/DataValidation.js";
+import { clearSensitiveData } from "../Modules/DataTransformation.js";
 
 api.post("/login/classical", async function (req, res) {
     const { email, password } = req.body;

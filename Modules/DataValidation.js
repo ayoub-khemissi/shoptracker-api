@@ -33,18 +33,3 @@ export function validateNumber(data) {
 export function validateTrackStatus(data) {
     return data === trackStatusEnabled || data === trackStatusDisabled;
 }
-
-export function cleanData(data) {
-    if (!data) { return null; }
-
-    return String(data).trim();
-}
-
-export function clearSensitiveData(data) {
-    if (!data) { return null; }
-
-    delete data.password_salt;
-    delete data.password_hash;
-    delete data.disabled;
-    return data;
-}
