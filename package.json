@@ -1,25 +1,31 @@
 {
-  "name": "shoptracker-api",
-  "version": "1.0.0",
-  "description": "ShopTracker API",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "start": "nodemon --env-file=.env index.js"
-  },
-  "keywords": [],
-  "author": "PrimeCode",
-  "license": "ISC",
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "nodemon": "^3.1.4"
-  },
-  "dependencies": {
-    "console-stamp": "^3.1.2",
-    "express": "^4.19.2",
-    "google-auth-library": "^9.11.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.10.2",
-    "stripe": "^16.2.0"
-  }
+    "name": "shoptracker-api",
+    "version": "1.0.0",
+    "description": "ShopTracker API",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon --env-file=.env index.js",
+        "format:check": "prettier --check .",
+        "format:write": "prettier --write .",
+        "lint:check": "eslint .",
+        "lint:fix": "eslint --fix ."
+    },
+    "keywords": [],
+    "author": "PrimeCode",
+    "license": "ISC",
+    "devDependencies": {
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "nodemon": "^3.1.4",
+        "prettier": "^3.3.3"
+    },
+    "dependencies": {
+        "console-stamp": "^3.1.2",
+        "express": "^4.19.2",
+        "google-auth-library": "^9.11.0",
+        "jsonwebtoken": "^9.0.2",
+        "mysql2": "^3.10.2",
+        "stripe": "^16.2.0"
+    }
 }

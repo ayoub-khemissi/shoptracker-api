@@ -27,7 +27,8 @@ class Log {
     saveLog(level, text) {
         try {
             const values = [this.appInstanceId, level, text, Date.now()];
-            const query = "INSERT INTO log (app_instance_id, level, text, created_at) VALUES (?, ?, ?, ?)";
+            const query =
+                "INSERT INTO log (app_instance_id, level, text, created_at) VALUES (?, ?, ?, ?)";
             Database.execute(query, values);
         } catch (error) {
             console.error("@Log:saveLog - an error occurred: " + error);

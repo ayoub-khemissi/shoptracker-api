@@ -32,7 +32,8 @@ api.post("/register/classical", async function (req, res) {
     const passwordHash = hashPassword(password, passwordSalt);
 
     const valuesB = [email, passwordSalt, passwordHash, true, true, true, true, Date.now()];
-    const queryB = "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const queryB =
+        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     if (resultB.affectedRows === 0) {
@@ -49,7 +50,10 @@ api.post("/register/classical", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }) });
+    const data = clearSensitiveData({
+        ...resultC[0],
+        jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }),
+    });
 
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

@@ -1,7 +1,12 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { validateAddress, validateBoolean, validateName, validateZipcode } from "../Modules/DataValidation.js";
+import {
+    validateAddress,
+    validateBoolean,
+    validateName,
+    validateZipcode,
+} from "../Modules/DataValidation.js";
 import { cleanData } from "../Modules/DataTransformation.js";
 
 api.patch("/profile/update/", async function (req, res) {
@@ -73,8 +78,22 @@ api.patch("/profile/update/", async function (req, res) {
         return;
     }
 
-    const valuesA = [firstname, lastname, country, city, address, zipcode, alertEmail, alertText, alertBrowserNotification, alertPushNotification, Date.now(), jwt.id];
-    const queryA = "UPDATE user SET firstname=?, lastname=?, country=?, city=?, address=?, zipcode=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, updated_at=? WHERE id=?";
+    const valuesA = [
+        firstname,
+        lastname,
+        country,
+        city,
+        address,
+        zipcode,
+        alertEmail,
+        alertText,
+        alertBrowserNotification,
+        alertPushNotification,
+        Date.now(),
+        jwt.id,
+    ];
+    const queryA =
+        "UPDATE user SET firstname=?, lastname=?, country=?, city=?, address=?, zipcode=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, updated_at=? WHERE id=?";
     await Database.execute(queryA, valuesA);
 
     res.status(200).json({ data: null, msg: "User successfully updated." });

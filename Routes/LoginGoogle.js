@@ -26,7 +26,7 @@ api.post("/login/google", async function (req, res) {
         return;
     }
 
-    if (!await verifyGoogleJwt(googleJwt)) {
+    if (!(await verifyGoogleJwt(googleJwt))) {
         res.status(401).json({ data: null, msg: "Invalid Google JWT." });
         return;
     }
@@ -38,7 +38,8 @@ api.post("/login/google", async function (req, res) {
     let data = null;
     if (resultA.length === 0) {
         const valuesB = [email, firstname, photo, true, true, true, true, Date.now()];
-        const queryB = "INSERT INTO user (email, firstname, photo, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        const queryB =
+            "INSERT INTO user (email, firstname, photo, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         const [resultB] = await Database.execute(queryB, valuesB);
 
         if (resultB.affectedRows === 0) {
@@ -55,9 +56,15 @@ api.post("/login/google", async function (req, res) {
             return;
         }
 
-        data = clearSensitiveData({ ...resultC[0], jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }) });
+        data = clearSensitiveData({
+            ...resultC[0],
+            jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }),
+        });
     } else {
-        data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }) });
+        data = clearSensitiveData({
+            ...resultA[0],
+            jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }),
+        });
     }
 
     res.status(200).json({ data: data, msg: "User successfully logged in." });

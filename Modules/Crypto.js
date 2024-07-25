@@ -1,7 +1,10 @@
 import crypto from "crypto";
 
 export function generateSalt() {
-    return crypto.randomBytes(Math.ceil(32 / 2)).toString("hex").slice(0, 32);
+    return crypto
+        .randomBytes(Math.ceil(32 / 2))
+        .toString("hex")
+        .slice(0, 32);
 }
 
 export function hashPassword(password, salt) {

@@ -7,10 +7,10 @@ const client = new OAuth2Client(googleSignWebClientId);
 
 export async function verifyGoogleJwt(googleJwt) {
     try {
-        return !!await client.verifyIdToken({
+        return !!(await client.verifyIdToken({
             idToken: googleJwt,
-            audience: googleSignWebClientId
-        });
+            audience: googleSignWebClientId,
+        }));
     } catch (error) {
         return false;
     }

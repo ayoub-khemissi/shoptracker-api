@@ -17,7 +17,10 @@ api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 
 api.get("/", function (req, res) {
-    res.status(200).send({ data: { description: description, version: version }, msg: "The API is up!" });
+    res.status(200).send({
+        data: { description: description, version: version },
+        msg: "The API is up!",
+    });
 });
 
 api.listen(apiPort, apiHostname, async function () {

@@ -16,7 +16,8 @@ const {
 const Config = {
     apiPort: SHOPTRACKER_API_PORT,
     apiHostname: SHOPTRACKER_API_HOSTNAME,
-    apiHttpSecure: String(SHOPTRACKER_API_HTTPSECURE) === "1" || String(SHOPTRACKER_API_HTTPSECURE) === "true",
+    apiHttpSecure:
+        String(SHOPTRACKER_API_HTTPSECURE) === "1" || String(SHOPTRACKER_API_HTTPSECURE) === "true",
     apiJwtSecret: SHOPTRACKER_API_JWT_SECRET,
     googleSignWebClientId: SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID,
     dbHost: SHOPTRACKER_DB_HOST,

@@ -36,7 +36,10 @@ api.post("/login/classical", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData({ ...resultA[0], jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }) });
+    const data = clearSensitiveData({
+        ...resultA[0],
+        jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }),
+    });
 
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });
