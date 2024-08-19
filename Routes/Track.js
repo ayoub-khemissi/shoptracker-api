@@ -15,6 +15,7 @@ const {
     trackStatusEnabled,
     trackStatusEnabledDefaultMaxProducts,
     trackStatusDisabledDefaultMaxProducts,
+    trackExtractionRuleFull,
 } = Constants;
 
 api.post("/track", async function (req, res) {
@@ -58,7 +59,7 @@ api.post("/track", async function (req, res) {
     }
 
     const valuesA = [jwt.id, trackStatus];
-    const queryA = "SELECT 1 FROM track WHERE user_id=? AND status=?";
+    const queryA = "SELECT 1 FROM track WHERE user_id=? AND status_id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     const valuesB = [jwt.id, jwt.id];
@@ -101,10 +102,11 @@ api.post("/track", async function (req, res) {
         trackPrice,
         trackPriceThreshold,
         trackStatus,
+        trackExtractionRuleFull,
         Date.now(),
     ];
     const queryC =
-        "INSERT INTO track (user_id, url, additional_info, track_stock, track_price, track_price_threshold, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO track (user_id, url, additional_info, track_stock, track_price, track_price_threshold, status_id, extraction_rule_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     await Database.execute(queryC, valuesC);
 
     res.status(200).json({ data: null, msg: "Track request successfully sent." });
