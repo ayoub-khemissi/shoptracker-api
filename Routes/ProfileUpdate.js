@@ -3,9 +3,8 @@ import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import {
     validateAddress,
-    validateBoolean,
     validateName,
-    validateZipcode,
+    validateZipcode
 } from "../Modules/DataValidation.js";
 import { cleanData } from "../Modules/DataTransformation.js";
 
@@ -23,10 +22,6 @@ api.patch("/profile/update/", async function (req, res) {
     const city = cleanData(req.body.city);
     const address = cleanData(req.body.address);
     const zipcode = cleanData(req.body.zipcode);
-    const alertEmail = req.body.alertEmail;
-    const alertText = req.body.alertText;
-    const alertBrowserNotification = req.body.alertBrowserNotification;
-    const alertPushNotification = req.body.alertPushNotification;
 
     if (firstname && !validateName(firstname)) {
         res.status(400).json({ data: null, msg: "Invalid firstname format." });
@@ -58,26 +53,6 @@ api.patch("/profile/update/", async function (req, res) {
         return;
     }
 
-    if (!validateBoolean(alertEmail)) {
-        res.status(400).json({ data: null, msg: "Invalid alertEmail format." });
-        return;
-    }
-
-    if (!validateBoolean(alertText)) {
-        res.status(400).json({ data: null, msg: "Invalid alertText format." });
-        return;
-    }
-
-    if (!validateBoolean(alertBrowserNotification)) {
-        res.status(400).json({ data: null, msg: "Invalid alertBrowserNotification format." });
-        return;
-    }
-
-    if (!validateBoolean(alertPushNotification)) {
-        res.status(400).json({ data: null, msg: "Invalid alertPushNotification format." });
-        return;
-    }
-
     const valuesA = [
         firstname,
         lastname,
@@ -85,16 +60,12 @@ api.patch("/profile/update/", async function (req, res) {
         city,
         address,
         zipcode,
-        alertEmail,
-        alertText,
-        alertBrowserNotification,
-        alertPushNotification,
         Date.now(),
         jwt.id,
     ];
     const queryA =
-        "UPDATE user SET firstname=?, lastname=?, country=?, city=?, address=?, zipcode=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, updated_at=? WHERE id=?";
+        "UPDATE user SET firstname=?, lastname=?, country=?, city=?, address=?, zipcode=?, updated_at=? WHERE id=?";
     await Database.execute(queryA, valuesA);
 
-    res.status(200).json({ data: null, msg: "User successfully updated." });
+    res.status(200).json({ data: null, msg: "User profile successfully updated." });
 });
