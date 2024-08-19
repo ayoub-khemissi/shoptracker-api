@@ -5,3 +5,4 @@ import "./Routes/LoginGoogle.js";
 import "./Routes/Track.js";
 import "./Routes/ProfileUpdate.js";
 import "./Routes/NotificationsUpdate.js";
+import "./Routes/TracksStats.js";
