@@ -6,3 +6,4 @@ import "./Routes/Track.js";
 import "./Routes/ProfileUpdate.js";
 import "./Routes/NotificationsUpdate.js";
 import "./Routes/TracksStats.js";
+import "./Routes/Tracklist.js";
