@@ -6,7 +6,7 @@ import {
     validateNumber
 } from "../Modules/DataValidation.js";
 
-api.post("/track/update", async function (req, res) {
+api.patch("/track/update", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
 
     if (!jwt) {
@@ -49,19 +49,19 @@ api.post("/track/update", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length < 1) {
-        res.status(403).json({ data: null, msg: "Track request forbidden." });
+        res.status(403).json({ data: null, msg: "Track update forbidden." });
         return;
     }
 
-    const valuesC = [
+    const valuesB = [
         trackStock,
         trackPrice,
         trackPriceThreshold,
         id
     ];
-    const queryC =
+    const queryB =
         "UPDATE track SET track_stock=?, track_price=?, track_price_threshold=? WHERE id=?";
-    await Database.execute(queryC, valuesC);
+    await Database.execute(queryB, valuesB);
 
     res.status(200).json({ data: null, msg: "Track successfully updated." });
 });
