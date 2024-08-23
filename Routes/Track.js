@@ -48,7 +48,12 @@ api.post("/track", async function (req, res) {
         return;
     }
 
-    if (trackPrice && !validateNumber(trackPriceThreshold)) {
+    if (!trackStock && !trackPrice) {
+        res.status(400).json({ data: null, msg: "Invalid trackStock & trackPrice format." });
+        return;
+    }
+
+    if (trackPrice && (!validateNumber(trackPriceThreshold) || trackPriceThreshold < 1)) {
         res.status(400).json({ data: null, msg: "Invalid trackPriceThreshold format." });
         return;
     }
