@@ -49,7 +49,7 @@ api.patch("/track/update", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length < 1) {
-        res.status(403).json({ data: null, msg: "Track update forbidden." });
+        res.status(403).json({ data: null, msg: "Track update denied, track not found." });
         return;
     }
 

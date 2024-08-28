@@ -25,8 +25,8 @@ api.post("/track/delete", async function (req, res) {
     const queryA = "SELECT 1 FROM track WHERE user_id=? AND id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
-    if (resultA.length < 1) {
-        res.status(403).json({ data: null, msg: "Track delete forbidden." });
+    if (resultA.length === 0) {
+        res.status(403).json({ data: null, msg: "Track delete denied, track not found." });
         return;
     }
 

@@ -10,8 +10,9 @@ const Constants = {
     trackCheckOk: 1,
     trackCheckKo: 2,
 
-    trackStatusEnabledDefaultMaxProducts: 1,
-    trackStatusDisabledDefaultMaxProducts: 5,
+    defaultTrackEnabledMaxProducts: 1,
+    defaultTrackDisabledMaxProducts: 5,
+    defaultTrackUserMaxSearchesPerDay: 5,
 
     logLevelInfo: 1,
     logLevelWarn: 2,

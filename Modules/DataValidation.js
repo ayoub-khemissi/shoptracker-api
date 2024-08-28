@@ -1,7 +1,3 @@
-import Constants from "../Utils/Constants.js";
-
-const { trackStatusEnabled, trackStatusDisabled } = Constants;
-
 export function validateEmail(email) {
     const emailRegex = /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     return email && emailRegex.test(email);
@@ -39,8 +35,4 @@ export function validateBoolean(data) {
 
 export function validateNumber(data) {
     return typeof data === "number";
-}
-
-export function validateTrackStatus(data) {
-    return data === trackStatusEnabled || data === trackStatusDisabled;
 }
