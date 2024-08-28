@@ -69,7 +69,7 @@ api.post("/track", async function (req, res) {
 
     const valuesC = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
     const queryC =
-        "SELECT COUNT(*) AS total_track_check_today FROM track_check WHERE created_at >= UNIX_TIMESTAMP(CURDATE()) * 1000 AND created_at < UNIX_TIMESTAMP(CURDATE() + INTERVAL 1 DAY) * 1000";
+        "SELECT COUNT(*) AS total_tracks_today FROM track WHERE created_at >= UNIX_TIMESTAMP(CURDATE()) * 1000 AND created_at < UNIX_TIMESTAMP(CURDATE() + INTERVAL 1 DAY) * 1000";
     const [resultC] = await Database.execute(queryC, valuesC);
 
     const valuesD = [jwt.id, url, trackStatusEnabled, trackStatusDisabled];
@@ -93,7 +93,7 @@ api.post("/track", async function (req, res) {
         trackStatus = trackStatusEnabled;
     }
 
-    if (resultC[0].total_track_check_today >= trackUserMaxSearchesPerDay) {
+    if (resultC[0].total_tracks_today >= trackUserMaxSearchesPerDay) {
         res.status(403).json({ data: null, msg: `Track request denied, reached user max searches per day limit: ${trackUserMaxSearchesPerDay}` });
         return;
     }
