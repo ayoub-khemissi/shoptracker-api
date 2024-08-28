@@ -8,6 +8,7 @@ import {
 } from "../Modules/DataValidation.js";
 import { cleanData } from "../Modules/DataTransformation.js";
 import Constants from "../Utils/Constants.js";
+import { retrieveSubscription } from "../Modules/Stripe.js";
 
 const {
     trackStatusEnabled,
@@ -59,12 +60,12 @@ api.post("/track", async function (req, res) {
 
     const valuesA = [jwt.id, jwt.id];
     const queryA =
-        "SELECT track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM subscription WHERE user_id=? AND created_at=(SELECT MAX(created_at) FROM subscription WHERE user_id=?)";
+        "SELECT stripe_subscription_id, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM subscription WHERE user_id=? AND created_at=(SELECT MAX(created_at) FROM subscription WHERE user_id=?)";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     const valuesB = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
     const queryB =
-        "SELECT (SELECT COUNT(*) FROM track WHERE user_id=? AND status_id=?) AS total_tracks_enabled, (SELECT COUNT(*) FROM track WHERE user_id=? AND status_id=?) AS total_tracks_disabled FROM track";
+        "SELECT (SELECT COUNT(*) FROM track WHERE user_id=? AND status_id=?) AS total_tracks_enabled, (SELECT COUNT(*) FROM track WHERE user_id=? AND status_id=?) AS total_tracks_disabled";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     const valuesC = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
@@ -77,9 +78,19 @@ api.post("/track", async function (req, res) {
         "SELECT 1 FROM track WHERE user_id=? AND url=? AND status_id IN (?, ?)";
     const [resultD] = await Database.execute(queryD, valuesD);
 
-    const trackEnabledMaxProducts = resultA.length > 0 ? resultA[0].track_enabled_max_products : defaultTrackEnabledMaxProducts;
-    const trackDisabledMaxProducts = resultA.length > 0 ? resultA[0].track_disabled_max_products : defaultTrackDisabledMaxProducts;
-    const trackUserMaxSearchesPerDay = resultA.length > 0 ? resultA[0].track_user_max_searches_per_day : defaultTrackUserMaxSearchesPerDay;
+    let trackEnabledMaxProducts = defaultTrackEnabledMaxProducts;
+    let trackDisabledMaxProducts = defaultTrackDisabledMaxProducts;
+    let trackUserMaxSearchesPerDay = defaultTrackUserMaxSearchesPerDay;
+
+    if (resultA.length > 0) {
+        const subscription = await retrieveSubscription(resultA[0].stripe_subscription_id);
+
+        if (subscription.status === "active") {
+            trackEnabledMaxProducts = resultA[0].track_enabled_max_products;
+            trackDisabledMaxProducts = resultA[0].track_disabled_max_products;
+            trackUserMaxSearchesPerDay = resultA[0].track_user_max_searches_per_day;
+        }
+    }
 
     let trackStatus;
     if (resultB[0].total_tracks_enabled >= trackEnabledMaxProducts) {
