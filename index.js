@@ -9,3 +9,5 @@ import "./Routes/TracksStats.js";
 import "./Routes/Tracklist.js";
 import "./Routes/TrackUpdate.js";
 import "./Routes/TrackDelete.js";
+import "./Routes/TrackEnable.js";
+import "./Routes/TrackDisable.js";
