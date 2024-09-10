@@ -8,7 +8,7 @@ import Constants from "../Utils/Constants.js";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
-const { apiHttpSecure, apiHostname, apiPort } = Config;
+const { SHOPTRACKER_API_HTTPSECURE, SHOPTRACKER_API_HOSTNAME, SHOPTRACKER_API_PORT } = Config;
 const { appId } = Constants;
 const { version, description } = JSON.parse(readFileSync("package.json"));
 
@@ -23,7 +23,7 @@ api.get("/", function (req, res) {
     });
 });
 
-api.listen(apiPort, apiHostname, async function () {
+api.listen(SHOPTRACKER_API_PORT, SHOPTRACKER_API_HOSTNAME, async function () {
     const values = [appId, version, Date.now()];
     const query = "INSERT INTO app_instance (app_id, version, created_at) VALUES (?, ?, ?)";
     const [result] = await Database.execute(query, values);
@@ -32,7 +32,7 @@ api.listen(apiPort, apiHostname, async function () {
         Log.setAppInstanceId(result.insertId);
     }
 
-    Log.info(`API listening on http${apiHttpSecure ? "s" : ""}://${apiHostname}:${apiPort}/.`);
+    Log.info(`API listening on http${SHOPTRACKER_API_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_API_HOSTNAME}:${SHOPTRACKER_API_PORT}/.`);
 });
 
 export default api;

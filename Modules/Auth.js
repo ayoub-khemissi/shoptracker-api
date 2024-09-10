@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import Config from "../Utils/Config.js";
 
-const { apiJwtSecret } = Config;
+const { SHOPTRACKER_API_JWT_SECRET } = Config;
 
 export function verifyAuthJwt(authJwt) {
     try {
-        return jwt.verify(authJwt, apiJwtSecret);
+        return jwt.verify(authJwt, SHOPTRACKER_API_JWT_SECRET);
     } catch (error) {
         return false;
     }
@@ -13,7 +13,7 @@ export function verifyAuthJwt(authJwt) {
 
 export function signAuthJwt(authPayload) {
     try {
-        return jwt.sign(authPayload, apiJwtSecret, { algorithm: "HS512", expiresIn: "30 days" });
+        return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, { algorithm: "HS512", expiresIn: "30 days" });
     } catch (error) {
         return null;
     }
