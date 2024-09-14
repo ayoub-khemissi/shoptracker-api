@@ -2,95 +2,35 @@ import Stripe from "stripe";
 import Config from "../Utils/Config.js";
 import Log from "./Log.js";
 
-const { stripeApiKey } = Config;
+const { STRIPE_API_KEY, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_HTTPSECURE } = Config;
 
-const stripe = new Stripe(stripeApiKey);
+const stripe = new Stripe(STRIPE_API_KEY);
 
-export async function createPaymentMethod(cardNumber, expMonth, expYear, cvc) {
+export async function updateCustomer(customerId, updateData) {
     try {
-        return stripe.paymentMethods.create({
-            type: "card",
-            card: {
-                number: cardNumber,
-                exp_month: expMonth,
-                exp_year: expYear,
-                cvc: cvc,
-            },
-        });
+        return await stripe.customers.update(customerId, updateData);
     } catch (error) {
-        Log.error("@Stripe:createPaymentMethod - an error occurred: " + error);
+        Log.error(`@Stripe:updateCustomer - Error updating customer: ${error}`);
         return null;
     }
 }
 
-export async function createCustomer(email, paymentMethodId, firstname, lastname, city, country, address, zipcode) {
+export async function retrieveCustomer(customerId) {
     try {
-        return stripe.customers.create({
-            email,
-            payment_method: paymentMethodId,
-            invoice_settings: {
-                default_payment_method: paymentMethodId,
-            },
-            name: `${firstname} ${lastname}`,
-            address: {
-                city: city,
-                country: country,
-                line1: address,
-                postal_code: zipcode,
-            },
-        });
+        return await stripe.customers.retrieve(customerId);
     } catch (error) {
-        Log.error("@Stripe:createCustomer - an error occurred: " + error);
+        Log.error(`@Stripe:retrieveCustomer - Error retrieving customer: ${error}`);
         return null;
     }
 }
 
-export async function createSubscription(customerId, priceId) {
+export async function cancelSubscriptionWithRefund(subscriptionId) {
     try {
-        return stripe.subscriptions.create({
-            customer: customerId,
-            items: [{ price: priceId }],
-            expand: ["latest_invoice.payment_intent"],
+        return await stripe.subscriptions.del(subscriptionId, {
+            prorate: true
         });
     } catch (error) {
-        Log.error("@Stripe:createSubscription - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function createPrice(productId, unitAmount, currency) {
-    try {
-        return stripe.prices.create({
-            unit_amount: unitAmount,
-            currency: currency,
-            recurring: {
-                interval: "month",
-            },
-            product: productId,
-        });
-    } catch (error) {
-        Log.error("@Stripe:createPrice - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function createRefund(paymentIntentId, amount) {
-    try {
-        return stripe.refunds.create({
-            payment_intent: paymentIntentId,
-            amount,
-        });
-    } catch (error) {
-        Log.error("@Stripe:createRefund - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function cancelSubscription(subscriptionId) {
-    try {
-        return stripe.subscriptions.cancel(subscriptionId);
-    } catch (error) {
-        Log.error("@Stripe:cancelSubscription - an error occurred: " + error);
+        Log.error(`@Stripe:cancelSubscriptionWithRefund - Error canceling subscription with refund: ${error}`);
         return null;
     }
 }
@@ -98,95 +38,72 @@ export async function cancelSubscription(subscriptionId) {
 export async function cancelSubscriptionAtPeriodEnd(subscriptionId) {
     try {
         return await stripe.subscriptions.update(subscriptionId, {
-            cancel_at_period_end: true,
+            cancel_at_period_end: true
         });
     } catch (error) {
-        Log.error("@Stripe:cancelSubscriptionAtPeriodEnd - an error occurred: " + error);
+        Log.error(`@Stripe:cancelSubscriptionAtPeriodEnd - Error scheduling subscription cancellation: ${error}`);
         return null;
     }
 }
 
-export async function updatePaymentMethod(paymentMethodId, cardNumber, expMonth, expYear, cvc) {
-    try {
-        return stripe.paymentMethods.update(paymentMethodId, {
-            card: {
-                number: cardNumber,
-                exp_month: expMonth,
-                exp_year: expYear,
-                cvc: cvc,
-            },
-        });
-    } catch (error) {
-        Log.error("@Stripe:updatePaymentMethod - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function updateCustomer(customerId, updatedInfo) {
-    return stripe.customers.update(customerId, updatedInfo);
-}
-
-export async function retrieveCustomer(customerId) {
-    try {
-        return await stripe.customers.retrieve(customerId);
-    } catch (error) {
-        Log.error("@Stripe:retrieveCustomer - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function updateSubscription(subscriptionId, newPriceId) {
+export async function updateSubscription(subscriptionId, newPriceId, newMetadata = {}) {
     try {
         return await stripe.subscriptions.update(subscriptionId, {
             items: [{
                 id: subscriptionId,
                 price: newPriceId,
             }],
+            metadata: newMetadata
         });
     } catch (error) {
-        Log.error("@Stripe:updateSubscription - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function retrievePaymentMethod(paymentMethodId) {
-    try {
-        return await stripe.paymentMethods.retrieve(paymentMethodId);
-    } catch (error) {
-        Log.error("@Stripe:retrievePaymentMethod - an error occurred: " + error);
-        return null;
-    }
-}
-
-export async function retrieveInvoice(invoiceId) {
-    try {
-        return stripe.invoices.retrieve(invoiceId, {
-            expand: ["payment_intent"],
-        });
-    } catch (error) {
-        Log.error("@Stripe:retrieveInvoice - an error occurred: " + error);
+        Log.error(`@Stripe:updateSubscription - Error updating subscription: ${error}`);
         return null;
     }
 }
 
 export async function retrieveSubscription(subscriptionId) {
     try {
-        return stripe.subscriptions.retrieve(subscriptionId, {
-            expand: ["latest_invoice.payment_intent"],
-        });
+        return await stripe.subscriptions.retrieve(subscriptionId);
     } catch (error) {
-        Log.error("@Stripe:retrieveSubscription - an error occurred: " + error);
+        Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription: ${error}`);
         return null;
     }
 }
 
-export async function listCustomerSubscriptions(customerId) {
+export async function createCheckoutSession(customerId, priceId) {
+    const frontBaseUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
+
     try {
-        return stripe.subscriptions.list({
-            customer: customerId,
-        });
+        const checkoutSessionParams = {
+            payment_method_types: ["card", "paypal"],
+            line_items: [
+                {
+                    price: priceId,
+                    quantity: 1,
+                },
+            ],
+            mode: "subscription",
+            success_url: `${frontBaseUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${frontBaseUrl}/subscribe`,
+        };
+
+        if (customerId) {
+            checkoutSessionParams.customer = customerId;
+        }
+
+        const session = await stripe.checkout.sessions.create(checkoutSessionParams);
+        return session;
     } catch (error) {
-        Log.error("@Stripe:listCustomerSubscriptions - an error occurred: " + error);
+        Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
+        return null;
+    }
+}
+
+export async function retrievePrice(priceId) {
+    try {
+        return await stripe.prices.retrieve(priceId);
+    } catch (error) {
+        Log.error(`@Stripe:retrievePrice - Error retrieving price: ${error}`);
         return null;
     }
 }
