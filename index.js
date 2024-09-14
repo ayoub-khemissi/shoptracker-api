@@ -11,3 +11,4 @@ import "./Routes/TrackUpdate.js";
 import "./Routes/TrackDelete.js";
 import "./Routes/TrackEnable.js";
 import "./Routes/TrackDisable.js";
+import "./Routes/CheckoutSession.js";
