@@ -6,6 +6,17 @@ const { STRIPE_API_KEY, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOP
 
 const stripe = new Stripe(STRIPE_API_KEY);
 
+export async function createCustomer(customerData) {
+    try {
+        return await stripe.customers.create({
+            ...customerData
+        });
+    } catch (error) {
+        Log.error(`@Stripe:updateCustomer - Error updating customer: ${error}`);
+        return null;
+    }
+}
+
 export async function updateCustomer(customerId, updateData) {
     try {
         return await stripe.customers.update(customerId, updateData);
@@ -24,9 +35,9 @@ export async function retrieveCustomer(customerId) {
     }
 }
 
-export async function cancelSubscriptionWithRefund(subscriptionId) {
+export async function cancelSubscription(subscriptionId) {
     try {
-        return await stripe.subscriptions.del(subscriptionId, {
+        return await stripe.subscriptions.cancel(subscriptionId, {
             prorate: true
         });
     } catch (error) {
@@ -35,25 +46,13 @@ export async function cancelSubscriptionWithRefund(subscriptionId) {
     }
 }
 
-export async function cancelSubscriptionAtPeriodEnd(subscriptionId) {
-    try {
-        return await stripe.subscriptions.update(subscriptionId, {
-            cancel_at_period_end: true
-        });
-    } catch (error) {
-        Log.error(`@Stripe:cancelSubscriptionAtPeriodEnd - Error scheduling subscription cancellation: ${error}`);
-        return null;
-    }
-}
-
-export async function updateSubscription(subscriptionId, newPriceId, newMetadata = {}) {
+export async function updateSubscription(subscriptionId, newPriceId) {
     try {
         return await stripe.subscriptions.update(subscriptionId, {
             items: [{
                 id: subscriptionId,
                 price: newPriceId,
-            }],
-            metadata: newMetadata
+            }]
         });
     } catch (error) {
         Log.error(`@Stripe:updateSubscription - Error updating subscription: ${error}`);
@@ -74,7 +73,7 @@ export async function createCheckoutSession(customerId, priceId) {
     const frontBaseUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
 
     try {
-        const checkoutSessionParams = {
+        return await stripe.checkout.sessions.create({
             payment_method_types: ["card", "paypal"],
             line_items: [
                 {
@@ -85,14 +84,8 @@ export async function createCheckoutSession(customerId, priceId) {
             mode: "subscription",
             success_url: `${frontBaseUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${frontBaseUrl}/subscribe`,
-        };
-
-        if (customerId) {
-            checkoutSessionParams.customer = customerId;
-        }
-
-        const session = await stripe.checkout.sessions.create(checkoutSessionParams);
-        return session;
+            customer: customerId
+        });
     } catch (error) {
         Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
         return null;

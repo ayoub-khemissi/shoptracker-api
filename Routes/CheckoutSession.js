@@ -1,7 +1,7 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { createCheckoutSession, retrievePrice } from "../Modules/Stripe.js";
+import { createCheckoutSession, createCustomer, retrievePrice } from "../Modules/Stripe.js";
 
 api.post("/checkout/session", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
@@ -19,7 +19,7 @@ api.post("/checkout/session", async function (req, res) {
     }
 
     const valuesA = [jwt.id];
-    const queryA = "SELECT stripe_customer_id FROM user WHERE id=?";
+    const queryA = "SELECT email, stripe_customer_id FROM user WHERE id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length === 0) {
@@ -27,7 +27,18 @@ api.post("/checkout/session", async function (req, res) {
         return;
     }
 
-    const session = await createCheckoutSession(resultA[0].stripe_customer_id, priceId);
+    const user = resultA[0];
+
+    if (!user.stripe_customer_id) {
+        const customer = await createCustomer({ email: user.email });
+        user.stripe_customer_id = customer.id;
+
+        const valuesB = [customer.id, jwt.id];
+        const queryB = "UPDATE user SET stripe_customer_id=? WHERE id=?";
+        await Database.execute(queryB, valuesB);
+    }
+
+    const session = await createCheckoutSession(user.stripe_customer_id, priceId);
 
     if (!session) {
         res.status(500).json({ data: null, msg: "Failed to create checkout session." });
