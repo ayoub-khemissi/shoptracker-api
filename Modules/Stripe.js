@@ -12,7 +12,7 @@ export async function createCustomer(customerData) {
             ...customerData
         });
     } catch (error) {
-        Log.error(`@Stripe:updateCustomer - Error updating customer: ${error}`);
+        Log.error(`@Stripe:createCustomer - Error creating customer: ${error}`);
         return null;
     }
 }
@@ -41,7 +41,7 @@ export async function cancelSubscription(subscriptionId) {
             prorate: true
         });
     } catch (error) {
-        Log.error(`@Stripe:cancelSubscriptionWithRefund - Error canceling subscription with refund: ${error}`);
+        Log.error(`@Stripe:cancelSubscription - Error canceling subscription: ${error}`);
         return null;
     }
 }
