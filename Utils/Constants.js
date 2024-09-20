@@ -14,6 +14,9 @@ const Constants = {
     defaultTrackDisabledMaxProducts: 5,
     defaultTrackUserMaxSearchesPerDay: 5,
 
+    subscriptionActive: 1,
+    subscriptionCanceled: 2,
+
     logLevelInfo: 1,
     logLevelWarn: 2,
     logLevelError: 3,
