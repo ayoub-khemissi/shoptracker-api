@@ -13,3 +13,4 @@ import "./Routes/TrackDisable.js";
 import "./Routes/CheckoutSession.js";
 import "./Routes/SubscriptionCancel.js";
 import "./Routes/AccountDelete.js";
+import "./Routes/StripeWebhook.js";

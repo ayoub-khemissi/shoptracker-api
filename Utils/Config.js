@@ -13,6 +13,7 @@ const {
     SHOPTRACKER_DB_PASSWORD,
     SHOPTRACKER_DB_DATABASE,
     STRIPE_API_KEY,
+    STRIPE_WEBHOOK_KEY,
     // eslint-disable-next-line no-undef
 } = process.env;
 
@@ -33,6 +34,7 @@ const Config = {
     SHOPTRACKER_DB_PASSWORD: SHOPTRACKER_DB_PASSWORD,
     SHOPTRACKER_DB_DATABASE: SHOPTRACKER_DB_DATABASE,
     STRIPE_API_KEY: STRIPE_API_KEY,
+    STRIPE_WEBHOOK_KEY: STRIPE_WEBHOOK_KEY,
 };
 
 export default Config;

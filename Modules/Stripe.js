@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import Config from "../Utils/Config.js";
 import Log from "./Log.js";
 
-const { STRIPE_API_KEY, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_HTTPSECURE } = Config;
+const { STRIPE_API_KEY, STRIPE_WEBHOOK_KEY, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_HTTPSECURE } = Config;
 
 const stripe = new Stripe(STRIPE_API_KEY);
 
@@ -97,6 +97,15 @@ export async function retrievePrice(priceId) {
         return await stripe.prices.retrieve(priceId);
     } catch (error) {
         Log.error(`@Stripe:retrievePrice - Error retrieving price: ${error}`);
+        return null;
+    }
+}
+
+export function constructEvent(body, stripeSignature) {
+    try {
+        return stripe.webhooks.constructEvent(body, stripeSignature, STRIPE_WEBHOOK_KEY);
+    } catch (error) {
+        Log.error(`@Stripe:constructEvent - Error construct event: ${error}`);
         return null;
     }
 }
