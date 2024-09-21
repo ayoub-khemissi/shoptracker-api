@@ -17,6 +17,7 @@ const {
     defaultTrackDisabledMaxProducts,
     defaultTrackUserMaxSearchesPerDay,
     trackExtractionRuleFull,
+    subscriptionActive
 } = Constants;
 
 api.post("/track", async function (req, res) {
@@ -58,9 +59,9 @@ api.post("/track", async function (req, res) {
         return;
     }
 
-    const valuesA = [jwt.id, jwt.id];
+    const valuesA = [jwt.id, subscriptionActive];
     const queryA =
-        "SELECT stripe_subscription_id, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM subscription WHERE user_id=? AND created_at=(SELECT MAX(created_at) FROM subscription WHERE user_id=?)";
+        "SELECT s.stripe_subscription_id, p.track_enabled_max_products, p.track_disabled_max_products, p.track_user_max_searches_per_day FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.stripe_price_id=p.stripe_price_id";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     const valuesB = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
@@ -110,7 +111,7 @@ api.post("/track", async function (req, res) {
     }
 
     if (resultD.length > 0) {
-        res.status(403).json({ data: null, msg: "Track request denied, product already in tracklist." });
+        res.status(409).json({ data: null, msg: "Track request denied, product already in tracklist." });
         return;
     }
 
