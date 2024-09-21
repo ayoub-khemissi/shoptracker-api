@@ -71,6 +71,6 @@ api.post("/register/google", async function (req, res) {
     const jwt = signAuthJwt({ email: resultC[0].email, id: resultC[0].id });
     const data = clearSensitiveData({ ...resultC[0] });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

@@ -69,6 +69,6 @@ api.post("/login/google", async function (req, res) {
         jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
     }
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });

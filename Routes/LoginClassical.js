@@ -44,6 +44,6 @@ api.post("/login/classical", async function (req, res) {
     const jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
     const data = clearSensitiveData({ ...resultA[0] });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });
