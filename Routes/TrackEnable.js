@@ -35,7 +35,7 @@ api.patch("/track/enable", async function (req, res) {
     }
 
     if (resultA[0].status_id === trackStatusEnabled) {
-        res.status(403).json({ data: null, msg: "Track enable request denied, track already enabled." });
+        res.status(409).json({ data: null, msg: "Track enable request denied, track already enabled." });
         return;
     }
 
