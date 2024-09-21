@@ -6,7 +6,7 @@ import Constants from "../Utils/Constants.js";
 
 const { subscriptionActive, subscriptionCanceled } = Constants;
 
-api.post('/stripe-webhook', async function (req, res) {
+api.post('/stripe/webhook', async function (req, res) {
     const stripeSignature = req.headers["stripe-signature"];
 
     const event = constructEvent(req.body, stripeSignature);

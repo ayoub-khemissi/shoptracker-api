@@ -13,6 +13,7 @@ const { appId } = Constants;
 const { version, description } = JSON.parse(readFileSync("package.json"));
 
 const api = express();
+api.use("/stripe/webhook", express.raw({ type: "application/json" }));
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 
