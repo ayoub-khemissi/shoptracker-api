@@ -1,4 +1,4 @@
-export function cleanData(data) {
+export function cleanStringData(data) {
     if (!data || typeof data !== "string" || data.length === 0) {
         return null;
     }

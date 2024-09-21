@@ -2,15 +2,15 @@ import api from "../Modules/Api.js";
 import { signAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
-import { cleanData, clearSensitiveData } from "../Modules/DataTransformation.js";
+import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformation.js";
 
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 
 api.post("/register/google", async function (req, res) {
-    const email = cleanData(req.body.email);
-    const firstname = cleanData(req.body.firstname);
-    const photo = cleanData(req.body.photo);
-    const googleJwt = cleanData(req.body.googleJwt);
+    const email = cleanStringData(req.body.email);
+    const firstname = cleanStringData(req.body.firstname);
+    const photo = cleanStringData(req.body.photo);
+    const googleJwt = cleanStringData(req.body.googleJwt);
 
     if (!validateEmail(email)) {
         res.status(400).json({ data: null, msg: "Invalid email format." });

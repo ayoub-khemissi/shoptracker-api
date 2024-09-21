@@ -6,7 +6,7 @@ import {
     validateNumber,
     validateUrl,
 } from "../Modules/DataValidation.js";
-import { cleanData } from "../Modules/DataTransformation.js";
+import { cleanStringData } from "../Modules/DataTransformation.js";
 import Constants from "../Utils/Constants.js";
 import { retrieveSubscription } from "../Modules/Stripe.js";
 
@@ -37,8 +37,8 @@ api.post("/track", async function (req, res) {
         return;
     }
 
-    const url = cleanData(req.body.url);
-    const additionalInfo = cleanData(req.body.additionalInfo ?? "");
+    const url = cleanStringData(req.body.url);
+    const additionalInfo = cleanStringData(req.body.additionalInfo ?? "");
     const trackStock = req.body.trackStock;
     const trackPrice = req.body.trackPrice;
     const trackPriceThreshold = req.body.trackPriceThreshold ?? null;
