@@ -4,7 +4,7 @@ import Database from "../Modules/Database.js";
 import { validateBoolean } from "../Modules/DataValidation.js";
 
 api.patch("/notifications/update/", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
+    const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

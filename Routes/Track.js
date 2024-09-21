@@ -21,7 +21,7 @@ const {
 } = Constants;
 
 api.post("/track", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
+    const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

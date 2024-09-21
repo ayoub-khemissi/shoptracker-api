@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import Config from "../Utils/Config.js";
+import Constants from "../Utils/Constants.js";
 
 const { SHOPTRACKER_API_JWT_SECRET } = Config;
+const { jwtExpirationTime } = Constants;
 
 export function verifyAuthJwt(authJwt) {
     try {
@@ -13,22 +15,16 @@ export function verifyAuthJwt(authJwt) {
 
 export function signAuthJwt(authPayload) {
     try {
-        return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, { algorithm: "HS512", expiresIn: "30 days" });
+        return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, { algorithm: "HS512", expiresIn: jwtExpirationTime });
     } catch (error) {
         return null;
     }
 }
 
-export function extractJwt(authorizationHeader) {
-    if (!authorizationHeader) {
+export function extractJwt(cookies) {
+    if (!cookies || typeof cookies !== "object" || !cookies.jwt) {
         return null;
     }
 
-    const parts = authorizationHeader.split(" ");
-
-    if (parts.length !== 2 || parts[0] !== "Bearer") {
-        return null;
-    }
-
-    return parts[1];
+    return cookies.jwt;
 }

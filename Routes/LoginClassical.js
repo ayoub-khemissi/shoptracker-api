@@ -4,6 +4,11 @@ import { hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
 import { validateEmail, validateHash512 } from "../Modules/DataValidation.js";
 import { clearSensitiveData } from "../Modules/DataTransformation.js";
+import Config from "../Utils/Config.js";
+import Constants from "../Utils/Constants.js";
+
+const { SHOPTRACKER_API_HTTPSECURE } = Config;
+const { jwtExpirationTime } = Constants;
 
 api.post("/login/classical", async function (req, res) {
     const { email, password } = req.body;
@@ -36,10 +41,9 @@ api.post("/login/classical", async function (req, res) {
         return;
     }
 
-    const data = clearSensitiveData({
-        ...resultA[0],
-        jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }),
-    });
+    const jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
+    const data = clearSensitiveData({ ...resultA[0] });
 
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });

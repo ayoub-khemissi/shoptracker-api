@@ -17,6 +17,8 @@ const Constants = {
     subscriptionActive: 1,
     subscriptionCanceled: 2,
 
+    jwtExpirationTime: 30 * 24 * 60 * 60 * 1000,
+
     logLevelInfo: 1,
     logLevelWarn: 2,
     logLevelError: 3,

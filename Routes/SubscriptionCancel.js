@@ -7,7 +7,7 @@ import Constants from "../Utils/Constants.js";
 const { subscriptionActive, subscriptionCanceled } = Constants;
 
 api.post("/subscription/cancel", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
+    const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

@@ -4,7 +4,7 @@ import Database from "../Modules/Database.js";
 import { createCheckoutSession, createCustomer, retrievePrice } from "../Modules/Stripe.js";
 
 api.post("/checkout/session", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
+    const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

@@ -3,7 +3,7 @@ import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 
 api.get("/tracklist", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.headers.authorization));
+    const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

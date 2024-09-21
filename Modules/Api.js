@@ -5,6 +5,7 @@ import Config from "../Utils/Config.js";
 import Database from "./Database.js";
 import Log from "./Log.js";
 import Constants from "../Utils/Constants.js";
+import cookieParser from "cookie-parser";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
@@ -16,6 +17,7 @@ const api = express();
 api.use("/stripe/webhook", express.raw({ type: "application/json" }));
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
+api.use(cookieParser());
 
 api.get("/", function (req, res) {
     res.status(200).send({

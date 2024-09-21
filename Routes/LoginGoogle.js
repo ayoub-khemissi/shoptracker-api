@@ -4,6 +4,11 @@ import Database from "../Modules/Database.js";
 import { validateEmail, validateName, validateUrl } from "../Modules/DataValidation.js";
 import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformation.js";
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
+import Config from "../Utils/Config.js";
+import Constants from "../Utils/Constants.js";
+
+const { SHOPTRACKER_API_HTTPSECURE } = Config;
+const { jwtExpirationTime } = Constants;
 
 api.post("/login/google", async function (req, res) {
     const email = cleanStringData(req.body.email);
@@ -36,6 +41,7 @@ api.post("/login/google", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     let data = null;
+    let jwt = null;
     if (resultA.length === 0) {
         const valuesB = [email, firstname, photo, true, true, true, true, Date.now()];
         const queryB =
@@ -56,16 +62,13 @@ api.post("/login/google", async function (req, res) {
             return;
         }
 
-        data = clearSensitiveData({
-            ...resultC[0],
-            jwt: signAuthJwt({ email: resultC[0].email, id: resultC[0].id }),
-        });
+        data = clearSensitiveData({ ...resultC[0] });
+        jwt = signAuthJwt({ email: resultC[0].email, id: resultC[0].id });
     } else {
-        data = clearSensitiveData({
-            ...resultA[0],
-            jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }),
-        });
+        data = clearSensitiveData({ ...resultA[0] });
+        jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
     }
 
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });
