@@ -20,15 +20,14 @@ api.post('/stripe/webhook', async function (req, res) {
         case "customer.subscription.created":
             {
                 const subscription = event.data.object;
-                const { id: customerId, email: customerEmail } = subscription.customer;
                 const priceId = subscription.items.data[0].price.id;
 
-                const valuesA = [customerId, customerEmail];
-                const queryA = "SELECT id FROM user WHERE stripe_customer_id=? OR email=?";
+                const valuesA = [subscription.customer];
+                const queryA = "SELECT id FROM user WHERE stripe_customer_id=?";
                 const [resultA] = await Database.execute(queryA, valuesA);
 
                 if (resultA.length === 0) {
-                    Log.error(`/stripe-webhook:customer.subscription.created - No user found for stripe_customer_id=${customerId} & email=${customerEmail} & subscription=${subscription.id} & price=${priceId}`);
+                    Log.error(`/stripe-webhook:customer.subscription.created - No user found for stripe_customer_id=${subscription.customer} & subscription=${subscription.id} & price=${priceId}`);
                     res.sendStatus(400);
                     return;
                 }
@@ -50,7 +49,7 @@ api.post('/stripe/webhook', async function (req, res) {
                 }
 
                 const valuesD = [user.id, subscription.id, priceId, subscriptionActive, Date.now()];
-                const queryD = "INSERT INTO subscription (user_id, stripe_subscription_id, stripe_price_id, status_id, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+                const queryD = "INSERT INTO subscription (user_id, stripe_subscription_id, stripe_price_id, status_id, created_at) VALUES (?, ?, ?, ?, ?)";
                 await Database.execute(queryD, valuesD);
             }
             break;
