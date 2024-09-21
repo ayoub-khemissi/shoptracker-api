@@ -20,10 +20,7 @@ api.patch("/notifications/update/", async function (req, res) {
         return;
     }
 
-    const alertEmail = req.body.alertEmail;
-    const alertText = req.body.alertText;
-    const alertBrowserNotification = req.body.alertBrowserNotification;
-    const alertPushNotification = req.body.alertPushNotification;
+    const { alertEmail, alertText, alertBrowserNotification, alertPushNotification } = req.body;
 
     if (!validateBoolean(alertEmail)) {
         res.status(400).json({ data: null, msg: "Invalid alertEmail format." });

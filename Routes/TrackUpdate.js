@@ -23,9 +23,7 @@ api.patch("/track/update", async function (req, res) {
         return;
     }
 
-    const id = req.body.id;
-    const trackStock = req.body.trackStock;
-    const trackPrice = req.body.trackPrice;
+    const { id, trackStock, trackPrice } = req.body;
     const trackPriceThreshold = req.body.trackPriceThreshold ?? null;
 
     if (!validateNumber(id)) {

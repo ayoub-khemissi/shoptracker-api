@@ -37,10 +37,9 @@ api.post("/track", async function (req, res) {
         return;
     }
 
+    const { trackStock, trackPrice } = req.body;
     const url = cleanStringData(req.body.url);
-    const additionalInfo = cleanStringData(req.body.additionalInfo ?? "");
-    const trackStock = req.body.trackStock;
-    const trackPrice = req.body.trackPrice;
+    const additionalInfo = cleanStringData(req.body.additionalInfo) ?? "";
     const trackPriceThreshold = req.body.trackPriceThreshold ?? null;
 
     if (!validateUrl(url)) {

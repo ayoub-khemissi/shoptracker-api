@@ -27,7 +27,7 @@ api.patch("/track/enable", async function (req, res) {
         return;
     }
 
-    const id = req.body.id;
+    const { id } = req.body;
 
     if (!validateNumber(id)) {
         res.status(400).json({ data: null, msg: "Invalid id format." });
