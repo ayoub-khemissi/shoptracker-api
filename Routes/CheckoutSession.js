@@ -11,6 +11,15 @@ api.post("/checkout/session", async function (req, res) {
         return;
     }
 
+    const valuesAuth = [jwt.id, false];
+    const queryAuth = "SELECT 1 FROM user WHERE id=? AND disabled=?";
+    const [resultAuth] = await Database.execute(queryAuth, valuesAuth);
+
+    if (resultAuth.length === 0) {
+        res.status(404).json({ data: null, msg: "User not found or disabled." });
+        return;
+    }
+
     const { priceId } = req.body;
 
     if (!await retrievePrice(priceId)) {

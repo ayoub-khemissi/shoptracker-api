@@ -11,6 +11,15 @@ api.patch("/notifications/update/", async function (req, res) {
         return;
     }
 
+    const valuesAuth = [jwt.id, false];
+    const queryAuth = "SELECT 1 FROM user WHERE id=? AND disabled=?";
+    const [resultAuth] = await Database.execute(queryAuth, valuesAuth);
+
+    if (resultAuth.length === 0) {
+        res.status(404).json({ data: null, msg: "User not found or disabled." });
+        return;
+    }
+
     const alertEmail = req.body.alertEmail;
     const alertText = req.body.alertText;
     const alertBrowserNotification = req.body.alertBrowserNotification;

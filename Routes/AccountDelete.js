@@ -13,31 +13,31 @@ api.post("/account/delete/", async function (req, res) {
         return;
     }
 
-    const valuesA = [jwt.id, false];
-    const queryA = "SELECT 1 FROM user WHERE id=? AND disabled=?";
-    const [resultA] = await Database.execute(queryA, valuesA);
+    const valuesAuth = [jwt.id, false];
+    const queryAuth = "SELECT 1 FROM user WHERE id=? AND disabled=?";
+    const [resultAuth] = await Database.execute(queryAuth, valuesAuth);
 
-    if (resultA.length === 0) {
+    if (resultAuth.length === 0) {
         res.status(404).json({ data: null, msg: "User not found or disabled." });
         return;
     }
 
-    const valuesB = [jwt.id, subscriptionActive];
-    const queryB = "SELECT 1 FROM subscription WHERE user_id=? AND status_id=?";
-    const [resultB] = await Database.execute(queryB, valuesB);
+    const valuesA = [jwt.id, subscriptionActive];
+    const queryA = "SELECT 1 FROM subscription WHERE user_id=? AND status_id=?";
+    const [resultA] = await Database.execute(queryA, valuesA);
 
-    if (resultB.length > 0) {
+    if (resultA.length > 0) {
         res.status(400).json({ data: null, msg: "User has an active subscription." });
         return;
     }
 
-    const valuesC = [trackStatusDisabled, jwt.id];
-    const queryC = "UPDATE track SET status_id=? WHERE user_id=?";
-    await Database.execute(queryC, valuesC);
+    const valuesB = [trackStatusDisabled, jwt.id];
+    const queryB = "UPDATE track SET status_id=? WHERE user_id=?";
+    await Database.execute(queryB, valuesB);
 
-    const valuesD = [null, false, false, false, false, true, Date.now(), jwt.id];
-    const queryD = "UPDATE user SET photo=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, disabled=?, updated_at=? WHERE id=?";
-    await Database.execute(queryD, valuesD);
+    const valuesC = [null, false, false, false, false, true, Date.now(), jwt.id];
+    const queryC = "UPDATE user SET photo=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, disabled=?, updated_at=? WHERE id=?";
+    await Database.execute(queryC, valuesC);
 
     res.status(200).json({ data: null, msg: "User account successfully deleted." });
 });

@@ -10,6 +10,15 @@ api.get("/tracklist", async function (req, res) {
         return;
     }
 
+    const valuesAuth = [jwt.id, false];
+    const queryAuth = "SELECT 1 FROM user WHERE id=? AND disabled=?";
+    const [resultAuth] = await Database.execute(queryAuth, valuesAuth);
+
+    if (resultAuth.length === 0) {
+        res.status(404).json({ data: null, msg: "User not found or disabled." });
+        return;
+    }
+
     const valuesA = [jwt.id];
     const queryA = "SELECT id, url, name, description, currency, additional_info, track_stock, track_price, track_price_threshold, status_id, created_at, updated_at FROM track WHERE user_id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
