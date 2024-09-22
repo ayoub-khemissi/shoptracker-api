@@ -18,9 +18,9 @@ export function validateZipcode(zipcode) {
     return zipcode && zipcodeRegex.test(zipcode);
 }
 
-export function validateHash512(hash) {
-    const hashRegex = /^[a-fA-F0-9]{128}$/;
-    return hash && hashRegex.test(hash);
+export function validatePassword(password) {
+    const hashRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return password && hashRegex.test(password);
 }
 
 export function validateUrl(url) {
