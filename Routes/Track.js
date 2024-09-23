@@ -136,7 +136,12 @@ api.post("/track", async function (req, res) {
     ];
     const queryE =
         "INSERT INTO track (user_id, url, additional_info, track_stock, track_price, track_price_threshold, status_id, extraction_rule_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    await Database.execute(queryE, valuesE);
+    const [resultE] = await Database.execute(queryE, valuesE);
+
+    if (resultE.affectedRows === 0) {
+        res.status(400).json({ data: null, msg: "Track not inserted." });
+        return;
+    }
 
     res.status(201).json({ data: null, msg: "Track request successfully sent." });
 });

@@ -44,13 +44,17 @@ api.post('/stripe/webhook', async function (req, res) {
                         const queryC = "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
                         await Database.execute(queryC, valuesC);
                     } else {
-                        Log.error(`/stripe-webhook:customer.subscription.created - Old subscription failed to cancel ${sub.stripe_subscription_id} for user=${user.id}-${user.email}`);
+                        Log.error(`/stripe-webhook:customer.subscription.created - Old subscription failed to cancel subscription=${sub.stripe_subscription_id} for user=${user.id}-${user.email}`);
                     }
                 }
 
                 const valuesD = [user.id, subscription.id, priceId, subscriptionActive, Date.now()];
                 const queryD = "INSERT INTO subscription (user_id, stripe_subscription_id, stripe_price_id, status_id, created_at) VALUES (?, ?, ?, ?, ?)";
-                await Database.execute(queryD, valuesD);
+                const [resultD] = await Database.execute(queryD, valuesD);
+
+                if (resultD.affectedRows === 0) {
+                    Log.error(`/stripe-webhook:customer.subscription.created - Subscription failed to insert in database subscription=${subscription.id} for user=${user.id}-${user.email}`);
+                }
             }
             break;
 
