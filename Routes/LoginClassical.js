@@ -28,7 +28,7 @@ api.post("/login/classical", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length === 0) {
-        res.status(401).json({ data: null, msg: "Bad credentials." });
+        res.status(404).json({ data: null, msg: "Bad credentials." });
         return;
     }
 
@@ -37,7 +37,7 @@ api.post("/login/classical", async function (req, res) {
     const realPasswordHash = resultA[0].password_hash;
 
     if (!passwordSalt || !passwordHash || !realPasswordHash || passwordHash !== realPasswordHash) {
-        res.status(401).json({ data: null, msg: "Bad credentials." });
+        res.status(404).json({ data: null, msg: "Bad credentials." });
         return;
     }
 
