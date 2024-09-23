@@ -41,10 +41,10 @@ api.post("/register/google", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length > 0) {
-        const data = clearSensitiveData({
-            ...resultA[0],
-            jwt: signAuthJwt({ email: resultA[0].email, id: resultA[0].id }),
-        });
+        const jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
+        const data = clearSensitiveData({ ...resultA[0] });
+
+        res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
         res.status(200).json({ data: data, msg: "User successfully logged in." });
         return;
     }
