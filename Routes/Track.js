@@ -138,5 +138,5 @@ api.post("/track", async function (req, res) {
         "INSERT INTO track (user_id, url, additional_info, track_stock, track_price, track_price_threshold, status_id, extraction_rule_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     await Database.execute(queryE, valuesE);
 
-    res.status(200).json({ data: null, msg: "Track request successfully sent." });
+    res.status(201).json({ data: null, msg: "Track request successfully sent." });
 });
