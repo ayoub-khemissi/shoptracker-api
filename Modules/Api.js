@@ -6,6 +6,7 @@ import Database from "./Database.js";
 import Log from "./Log.js";
 import Constants from "../Utils/Constants.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
@@ -18,6 +19,7 @@ api.use("/stripe/webhook", express.raw({ type: "application/json" }));
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 api.use(cookieParser());
+api.use(cors({ credentials: true }));
 
 api.get("/", function (req, res) {
     res.status(200).send({
