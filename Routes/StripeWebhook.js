@@ -48,11 +48,23 @@ api.post('/stripe/webhook', async function (req, res) {
                     }
                 }
 
-                const valuesD = [user.id, subscription.id, priceId, subscriptionActive, Date.now()];
-                const queryD = "INSERT INTO subscription (user_id, stripe_subscription_id, stripe_price_id, status_id, created_at) VALUES (?, ?, ?, ?, ?)";
+                const valuesD = [priceId];
+                const queryD = "SELECT id FROM plan WHERE stripe_price_id=?";
                 const [resultD] = await Database.execute(queryD, valuesD);
 
-                if (resultD.affectedRows === 0) {
+                if (resultD.length === 0) {
+                    Log.error(`/stripe-webhook:customer.subscription.created - No plan found for stripe_customer_id=${subscription.customer} & subscription=${subscription.id} & price=${priceId}`);
+                    res.sendStatus(400);
+                    return;
+                }
+
+                const plan = resultD[0];
+
+                const valuesE = [user.id, subscription.id, plan.id, subscriptionActive, Date.now()];
+                const queryE = "INSERT INTO subscription (user_id, stripe_subscription_id, plan_id, status_id, created_at) VALUES (?, ?, ?, ?, ?)";
+                const [resultE] = await Database.execute(queryE, valuesE);
+
+                if (resultE.affectedRows === 0) {
                     Log.error(`/stripe-webhook:customer.subscription.created - Subscription failed to insert in database subscription=${subscription.id} for user=${user.id}-${user.email}`);
                 }
             }

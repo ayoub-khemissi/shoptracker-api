@@ -55,8 +55,21 @@ api.post("/register/classical", async function (req, res) {
         return;
     }
 
-    const jwt = signAuthJwt({ email: resultC[0].email, id: resultC[0].id })
-    const data = clearSensitiveData({ ...resultC[0] });
+    const user = resultC[0];
+
+    const valuesD = [];
+    const queryD = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
+    const [resultD] = await Database.execute(queryD, valuesD);
+
+    if (resultD.length === 0) {
+        res.status(400).json({ data: null, msg: "Free plan not found." });
+        return;
+    }
+
+    user.subscription = resultD[0];
+
+    const jwt = signAuthJwt({ email: user.email, id: user.id })
+    const data = clearSensitiveData({ ...user });
 
     res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(201).json({ data: data, msg: "User successfully created." });

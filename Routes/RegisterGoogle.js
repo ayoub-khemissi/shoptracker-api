@@ -8,7 +8,7 @@ import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 
 const { SHOPTRACKER_API_HTTPSECURE } = Config;
-const { jwtExpirationTime } = Constants;
+const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/register/google", async function (req, res) {
     const email = cleanStringData(req.body.email);
@@ -41,8 +41,29 @@ api.post("/register/google", async function (req, res) {
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length > 0) {
-        const jwt = signAuthJwt({ email: resultA[0].email, id: resultA[0].id });
-        const data = clearSensitiveData({ ...resultA[0] });
+        const user = resultA[0];
+
+        const valuesB = [user.id, subscriptionActive];
+        const queryB = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE id=(SELECT plan_id FROM subscription WHERE user_id=? AND status_id=?)";
+        const [resultB] = await Database.execute(queryB, valuesB);
+
+        if (resultB.length > 0) {
+            user.subscription = resultB[0];
+        } else {
+            const valuesC = [];
+            const queryC = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
+            const [resultC] = await Database.execute(queryC, valuesC);
+
+            if (resultC.length === 0) {
+                res.status(400).json({ data: null, msg: "Free plan not found." });
+                return;
+            }
+
+            user.subscription = resultC[0];
+        }
+
+        const jwt = signAuthJwt({ email: user.email, id: user.id });
+        const data = clearSensitiveData({ ...user });
 
         res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
         res.status(200).json({ data: data, msg: "User successfully logged in." });
@@ -68,8 +89,21 @@ api.post("/register/google", async function (req, res) {
         return;
     }
 
-    const jwt = signAuthJwt({ email: resultC[0].email, id: resultC[0].id });
-    const data = clearSensitiveData({ ...resultC[0] });
+    const user = resultC[0];
+
+    const valuesD = [];
+    const queryD = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
+    const [resultD] = await Database.execute(queryD, valuesD);
+
+    if (resultD.length === 0) {
+        res.status(400).json({ data: null, msg: "Free plan not found." });
+        return;
+    }
+
+    user.subscription = resultD[0];
+
+    const jwt = signAuthJwt({ email: user.email, id: user.id });
+    const data = clearSensitiveData({ ...user });
 
     res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(201).json({ data: data, msg: "User successfully created." });
