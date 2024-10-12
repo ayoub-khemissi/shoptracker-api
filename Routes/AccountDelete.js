@@ -5,7 +5,7 @@ import Constants from "../Utils/Constants.js";
 
 const { subscriptionActive, trackStatusDisabled } = Constants;
 
-api.post("/account/delete/", async function (req, res) {
+api.delete("/account/delete/", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {

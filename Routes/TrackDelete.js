@@ -6,7 +6,7 @@ import Constants from "../Utils/Constants.js";
 
 const { trackStatusArchived } = Constants;
 
-api.post("/track/delete", async function (req, res) {
+api.delete("/track/delete", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
