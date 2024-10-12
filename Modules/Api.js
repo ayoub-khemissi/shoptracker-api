@@ -10,7 +10,7 @@ import cors from "cors";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
-const { SHOPTRACKER_API_HTTPSECURE, SHOPTRACKER_API_HOSTNAME, SHOPTRACKER_API_PORT } = Config;
+const { SHOPTRACKER_API_HTTPSECURE, SHOPTRACKER_API_HOSTNAME, SHOPTRACKER_API_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_PORT } = Config;
 const { appId } = Constants;
 const { version, description } = JSON.parse(readFileSync("package.json"));
 
@@ -19,7 +19,7 @@ api.use("/stripe/webhook", express.raw({ type: "application/json" }));
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 api.use(cookieParser());
-api.use(cors({ credentials: true }));
+api.use(cors({ origin: `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`, credentials: true }));
 
 api.get("/", function (req, res) {
     res.status(200).send({
