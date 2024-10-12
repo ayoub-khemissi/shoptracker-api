@@ -7,7 +7,7 @@ import { clearSensitiveData } from "../Modules/DataTransformation.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 
-const { SHOPTRACKER_API_HTTPSECURE } = Config;
+const { SHOPTRACKER_FRONT_HTTPSECURE } = Config;
 const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/login/classical", async function (req, res) {
@@ -65,6 +65,6 @@ api.post("/login/classical", async function (req, res) {
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData({ ...user });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_API_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });
