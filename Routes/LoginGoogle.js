@@ -7,7 +7,7 @@ import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 
-const { SHOPTRACKER_FRONT_HTTPSECURE } = Config;
+const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN } = Config;
 const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/login/google", async function (req, res) {
@@ -111,6 +111,6 @@ api.post("/login/google", async function (req, res) {
         jwt = signAuthJwt({ email: user.email, id: user.id });
     }
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, maxAge: jwtExpirationTime, sameSite: "lax" });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: "strict", domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });
