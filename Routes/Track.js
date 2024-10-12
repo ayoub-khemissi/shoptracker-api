@@ -69,7 +69,7 @@ api.post("/track", async function (req, res) {
 
     const valuesA = [jwt.id, subscriptionActive];
     const queryA =
-        "SELECT s.stripe_subscription_id, p.track_enabled_max_products, p.track_disabled_max_products, p.track_user_max_searches_per_day FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.stripe_price_id=p.stripe_price_id";
+        "SELECT s.stripe_subscription_id, p.track_enabled_max_products, p.track_disabled_max_products, p.track_user_max_searches_per_day FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     const valuesB = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
@@ -93,6 +93,11 @@ api.post("/track", async function (req, res) {
 
     if (resultA.length > 0) {
         const subscription = await retrieveSubscription(resultA[0].stripe_subscription_id);
+
+        if (!subscription) {
+            res.status(400).json({ data: null, msg: "Stripe subscription not found or invalid." });
+            return;
+        }
 
         if (subscription.status === "active") {
             trackEnabledMaxProducts = resultA[0].track_enabled_max_products;
