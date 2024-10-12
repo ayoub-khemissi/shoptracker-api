@@ -19,7 +19,8 @@ api.use("/stripe/webhook", express.raw({ type: "application/json" }));
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 api.use(cookieParser());
-api.use(cors({ origin: `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`, credentials: true }));
+api.use(cors({ origin: `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`, credentials: true, methods: "GET,PUT,PATCH,POST,DELETE", allowedHeaders: ["Content-Type"] }));
+api.disable('x-powered-by');
 
 api.get("/", function (req, res) {
     res.status(200).send({
