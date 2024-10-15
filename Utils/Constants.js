@@ -19,10 +19,10 @@ const Constants = {
 
     jwtExpirationTime: 30 * 24 * 60 * 60 * 1000,
 
-    logLevelInfo: 1,
-    logLevelWarn: 2,
-    logLevelError: 3,
-    logLevelDebug: 4,
+    logLevelDebug: 1,
+    logLevelInfo: 2,
+    logLevelWarn: 3,
+    logLevelError: 4,
 
     appId: 1,
 };
