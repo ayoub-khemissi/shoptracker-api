@@ -19,10 +19,10 @@ class Log {
         this.saveLog(logLevelDebug, text);
     }
 
-/**
- * Logs an informational message
- * @param {string} text - The message to log
- */
+    /**
+     * Logs an informational message
+     * @param {string} text - The message to log
+     */
     info(text) {
         if (SHOPTRACKER_LOG_LEVEL > logLevelInfo) {
             return;
