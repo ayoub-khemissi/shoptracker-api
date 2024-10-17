@@ -1,9 +1,9 @@
 import { OAuth2Client } from "google-auth-library";
 import Config from "../Utils/Config.js";
 
-const { SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID } = Config;
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = Config;
 
-const client = new OAuth2Client(SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID);
+const client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
 
 /**
  * Verifies a given Google JWT.
@@ -16,7 +16,6 @@ export async function verifyGoogleJwt(googleJwt) {
     try {
         return !!(await client.verifyIdToken({
             idToken: googleJwt,
-            audience: SHOPTRACKER_GOOGLE_SIGN_WEB_CLIENT_ID,
         }));
     } catch (error) {
         return false;
