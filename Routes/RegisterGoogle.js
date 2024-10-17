@@ -60,7 +60,7 @@ api.post("/register/google", async function (req, res) {
 
     const valuesB = [email, true, true, true, true, Date.now()];
     const queryB =
-        "INSERT INTO user (email, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO user (email, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?)";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     if (resultB.affectedRows === 0) {
