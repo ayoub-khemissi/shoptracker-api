@@ -10,7 +10,5 @@ api.get("/track/stats", async function (req, res) {
         "SELECT (SELECT COUNT(*) FROM track WHERE status_id=?) total_tracks_enabled, (SELECT COUNT(*) FROM track_check) total_track_checks";
     const [resultA] = await Database.execute(queryA, valuesA);
 
-    const { total_tracks_enabled, total_track_checks } = resultA[0];
-
-    res.status(200).json({ data: { totalTracksEnabled: total_tracks_enabled, totalTrackChecks: total_track_checks }, msg: "Track stats successfully found." });
+    res.status(200).json({ data: resultA[0], msg: "Track stats successfully found." });
 });
