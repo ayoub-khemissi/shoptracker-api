@@ -109,3 +109,57 @@ export function constructEvent(body, stripeSignature) {
         return null;
     }
 }
+
+export async function getSubscriptionDetails(subscriptionId) {
+    try {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+        let paymentMethodText = null;
+        if (subscription.default_payment_method) {
+            const paymentMethod = await stripe.paymentMethods.retrieve(subscription.default_payment_method);
+
+            switch (paymentMethod?.type) {
+                case "card":
+                    paymentMethodText = `${paymentMethod.card.brand} ${paymentMethod.card.last4}`;
+                    break;
+                case "paypal":
+                    paymentMethodText = "PayPal";
+                    break;
+                case "sepa_debit":
+                    paymentMethodText = "SEPA";
+                    break;
+                default:
+                    paymentMethodText = paymentMethod.type?.toLocaleUpperCase().replaceAll("_", " ");
+                    break;
+            }
+        }
+
+        const invoices = await stripe.invoices.list({
+            subscription: subscriptionId,
+            limit: 6,
+            status: 'paid',
+        });
+
+        const invoiceHistory = invoices.data.filter(invoice => invoice.amount_paid > 0 || invoice.amount_paid < 0).map(invoice => ({
+            number: invoice.number,
+            date: invoice.created * 1000,
+            amount: (invoice.amount_paid / 100).toFixed(2),
+            currency: invoice.currency,
+            url: invoice.hosted_invoice_url
+        }));
+
+        const startDate = subscription.start_date * 1000;
+        const nextPaymentDate = subscription.current_period_end * 1000;
+
+        return {
+            start_date: startDate,
+            next_payment_date: nextPaymentDate,
+            payment_method: paymentMethodText,
+            invoice_history: invoiceHistory,
+        };
+
+    } catch (error) {
+        Log.error(`@Stripe:getSubscriptionDetails - Error retrieving subscription details: ${error}`);
+        return null;
+    }
+}
