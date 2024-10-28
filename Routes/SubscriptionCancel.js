@@ -31,6 +31,11 @@ api.post("/subscription/cancel", async function (req, res) {
         return;
     }
 
+    if (subscription.status !== "active") {
+        res.status(400).json({ data: null, msg: "Stripe subscription not active." });
+        return;
+    }
+
     const valuesA = [jwt.id, stripe_subscription_id, subscriptionActive];
     const queryA = "SELECT stripe_subscription_id FROM subscription WHERE user_id=? AND stripe_subscription_id=? AND status_id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
