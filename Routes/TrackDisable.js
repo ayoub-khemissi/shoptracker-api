@@ -6,7 +6,9 @@ import Constants from "../Utils/Constants.js";
 
 const {
     trackStatusDisabled,
-    trackStatusEnabled
+    trackStatusEnabled,
+    subscriptionActive,
+    defaultTrackDisabledMaxProducts
 } = Constants;
 
 api.patch("/track/disable", async function (req, res) {
@@ -44,6 +46,27 @@ api.patch("/track/disable", async function (req, res) {
 
     if (resultA[0].status_id !== trackStatusEnabled) {
         res.status(403).json({ data: null, msg: "Track disable request denied, track is not enabled so you cannot disable it." });
+        return;
+    }
+
+    let trackDisabledMaxProducts = defaultTrackDisabledMaxProducts;
+
+    const valuesB = [jwt.id, subscriptionActive];
+    const queryB =
+        "SELECT p.track_disabled_max_products FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const [resultB] = await Database.execute(queryB, valuesB);
+
+    const valuesC = [jwt.id, trackStatusDisabled];
+    const queryC =
+        "SELECT COUNT(*) AS total_tracks_disabled FROM track WHERE user_id=? AND status_id=?";
+    const [resultC] = await Database.execute(queryC, valuesC);
+
+    if (resultB.length > 0) {
+        trackDisabledMaxProducts = resultA[0].track_disabled_max_products;
+    }
+
+    if (resultC[0].total_tracks_disabled >= trackDisabledMaxProducts) {
+        res.status(403).json({ data: null, msg: `Track disable request denied, reached tracklist max products limit: ${trackDisabledMaxProducts}` });
         return;
     }
 

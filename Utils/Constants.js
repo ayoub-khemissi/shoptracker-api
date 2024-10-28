@@ -12,8 +12,8 @@ const Constants = {
     trackCheckKo: 2,
 
     defaultTrackEnabledMaxProducts: 1,
-    defaultTrackDisabledMaxProducts: 5,
-    defaultTrackUserMaxSearchesPerDay: 5,
+    defaultTrackDisabledMaxProducts: 3,
+    defaultTrackUserMaxSearchesPerDay: 3,
 
     subscriptionActive: 1,
     subscriptionCanceled: 2,

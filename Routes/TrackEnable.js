@@ -2,11 +2,11 @@ import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { validateNumber } from "../Modules/DataValidation.js";
-import { retrieveSubscription } from "../Modules/Stripe.js";
 import Constants from "../Utils/Constants.js";
 
 const {
     trackStatusEnabled,
+    subscriptionActive,
     defaultTrackEnabledMaxProducts
 } = Constants;
 
@@ -48,9 +48,9 @@ api.patch("/track/enable", async function (req, res) {
         return;
     }
 
-    const valuesB = [jwt.id, jwt.id];
+    const valuesB = [jwt.id, subscriptionActive];
     const queryB =
-        "SELECT stripe_subscription_id, track_enabled_max_products FROM subscription WHERE user_id=? AND created_at=(SELECT MAX(created_at) FROM subscription WHERE user_id=?)";
+        "SELECT p.track_enabled_max_products FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     const valuesC = [jwt.id, trackStatusEnabled];
@@ -61,11 +61,7 @@ api.patch("/track/enable", async function (req, res) {
     let trackEnabledMaxProducts = defaultTrackEnabledMaxProducts;
 
     if (resultB.length > 0) {
-        const subscription = await retrieveSubscription(resultA[0].stripe_subscription_id);
-
-        if (subscription.status === "active") {
-            trackEnabledMaxProducts = resultA[0].track_enabled_max_products;
-        }
+        trackEnabledMaxProducts = resultA[0].track_enabled_max_products;
     }
 
     if (resultC[0].total_tracks_enabled >= trackEnabledMaxProducts) {
