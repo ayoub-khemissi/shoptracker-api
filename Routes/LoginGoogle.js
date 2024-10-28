@@ -6,6 +6,7 @@ import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformati
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
+import { getSubscriptionDetails } from "../Modules/Stripe.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN } = Config;
 const { jwtExpirationTime, subscriptionActive } = Constants;
@@ -53,22 +54,22 @@ api.post("/login/google", async function (req, res) {
         const user = resultC[0];
 
         const valuesD = [user.id, subscriptionActive];
-        const queryD = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE id=(SELECT plan_id FROM subscription WHERE user_id=? AND status_id=?)";
+        const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id, p.track_check_interval FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
         const [resultD] = await Database.execute(queryD, valuesD);
 
         if (resultD.length > 0) {
             user.subscription = resultD[0];
+
+            const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+            user.subscription = { ...user.subscription, ...subscriptionDetails };
         } else {
-            const valuesE = [user.id, subscriptionActive];
-            const queryE = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
-            const [resultE] = await Database.execute(queryE, valuesE);
-
-            if (resultE.length === 0) {
-                res.status(400).json({ data: null, msg: "Free plan not found." });
-                return;
+            user.subscription = {
+                stripe_price_id: null,
+                start_date: null,
+                next_payment_date: null,
+                payment_method: null,
+                payment_history: [],
             }
-
-            user.subscription = resultE[0];
         }
 
         data = clearSensitiveData({ ...user });
@@ -77,22 +78,22 @@ api.post("/login/google", async function (req, res) {
         const user = resultA[0];
 
         const valuesB = [user.id, subscriptionActive];
-        const queryB = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE id=(SELECT plan_id FROM subscription WHERE user_id=? AND status_id=?)";
+        const queryB = "SELECT p.stripe_price_id, s.stripe_subscription_id, p.track_check_interval FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
         const [resultB] = await Database.execute(queryB, valuesB);
 
         if (resultB.length > 0) {
             user.subscription = resultB[0];
+
+            const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+            user.subscription = { ...user.subscription, ...subscriptionDetails };
         } else {
-            const valuesC = [];
-            const queryC = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
-            const [resultC] = await Database.execute(queryC, valuesC);
-
-            if (resultC.length === 0) {
-                res.status(400).json({ data: null, msg: "Free plan not found." });
-                return;
+            user.subscription = {
+                stripe_price_id: null,
+                start_date: null,
+                next_payment_date: null,
+                payment_method: null,
+                payment_history: [],
             }
-
-            user.subscription = resultC[0];
         }
 
         data = clearSensitiveData({ ...user });

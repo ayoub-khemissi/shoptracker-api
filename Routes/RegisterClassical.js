@@ -6,9 +6,10 @@ import { validateEmail, validatePassword } from "../Modules/DataValidation.js";
 import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformation.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
+import { getSubscriptionDetails } from "../Modules/Stripe.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN } = Config;
-const { jwtExpirationTime } = Constants;
+const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/register/classical", async function (req, res) {
     const email = cleanStringData(req.body.email);
@@ -57,16 +58,24 @@ api.post("/register/classical", async function (req, res) {
 
     const user = resultC[0];
 
-    const valuesD = [];
-    const queryD = "SELECT stripe_price_id, track_check_interval, track_enabled_max_products, track_disabled_max_products, track_user_max_searches_per_day FROM plan WHERE stripe_price_id IS NULL";
+    const valuesD = [user.id, subscriptionActive];
+    const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id, p.track_check_interval FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultD] = await Database.execute(queryD, valuesD);
 
-    if (resultD.length === 0) {
-        res.status(400).json({ data: null, msg: "Free plan not found." });
-        return;
-    }
+    if (resultD.length > 0) {
+        user.subscription = resultB[0];
 
-    user.subscription = resultD[0];
+        const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+        user.subscription = { ...user.subscription, ...subscriptionDetails };
+    } else {
+        user.subscription = {
+            stripe_price_id: null,
+            start_date: null,
+            next_payment_date: null,
+            payment_method: null,
+            payment_history: [],
+        }
+    }
 
     const jwt = signAuthJwt({ email: user.email, id: user.id })
     const data = clearSensitiveData({ ...user });
