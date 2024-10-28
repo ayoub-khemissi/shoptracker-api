@@ -2,7 +2,8 @@ const Constants = {
     trackStatusEnabled: 1,
     trackStatusDisabled: 2,
     trackStatusInvalid: 3,
-    trackStatusArchived: 4,
+    trackStatusDeleted: 4,
+    trackStatusFinished: 5,
 
     trackExtractionRuleFull: 1,
     trackExtractionRulePartial: 2,

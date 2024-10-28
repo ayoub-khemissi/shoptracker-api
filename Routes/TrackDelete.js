@@ -4,7 +4,7 @@ import Database from "../Modules/Database.js";
 import { validateNumber } from "../Modules/DataValidation.js";
 import Constants from "../Utils/Constants.js";
 
-const { trackStatusArchived } = Constants;
+const { trackStatusDeleted } = Constants;
 
 api.delete("/track/delete", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -39,7 +39,7 @@ api.delete("/track/delete", async function (req, res) {
         return;
     }
 
-    const valuesB = [trackStatusArchived, id];
+    const valuesB = [trackStatusDeleted, id];
     const queryB = "UPDATE track SET status_id=? WHERE id=?";
     await Database.execute(queryB, valuesB);
 
