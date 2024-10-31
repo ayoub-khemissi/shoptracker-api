@@ -44,7 +44,7 @@ api.post("/register/classical", async function (req, res) {
     const passwordSalt = generateSalt();
     const passwordHash = hashPassword(password, passwordSalt);
 
-    const valuesC = [email, passwordSalt, passwordHash, true, true, true, true, Date.now()];
+    const valuesC = [email, passwordSalt, passwordHash, true, false, true, true, Date.now()];
     const queryC = "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);
 

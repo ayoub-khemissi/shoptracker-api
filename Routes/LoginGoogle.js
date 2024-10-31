@@ -32,7 +32,7 @@ api.post("/login/google", async function (req, res) {
     let data = null;
     let jwt = null;
     if (resultA.length === 0) {
-        const valuesB = [email, true, true, true, true, Date.now()];
+        const valuesB = [email, true, false, true, true, Date.now()];
         const queryB =
             "INSERT INTO user (email, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         const [resultB] = await Database.execute(queryB, valuesB);
