@@ -82,8 +82,8 @@ export async function createCheckoutSession(customerId, priceId) {
                 },
             ],
             mode: "subscription",
-            success_url: `${frontBaseUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${frontBaseUrl}/subscribe`,
+            success_url: `${frontBaseUrl}/settings`,
+            cancel_url: `${frontBaseUrl}/pricing`,
             customer: customerId
         });
     } catch (error) {
