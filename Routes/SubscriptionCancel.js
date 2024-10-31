@@ -6,7 +6,7 @@ import Constants from "../Utils/Constants.js";
 
 const { subscriptionActive, subscriptionCanceled } = Constants;
 
-api.post("/subscription/cancel", async function (req, res) {
+api.delete("/subscription/cancel", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
 
     if (!jwt) {
@@ -23,9 +23,18 @@ api.post("/subscription/cancel", async function (req, res) {
         return;
     }
 
-    const { stripe_subscription_id } = req.body;
+    const valuesA = [jwt.id, subscriptionActive];
+    const queryA = "SELECT stripe_subscription_id FROM subscription WHERE user_id=? AND status_id=?";
+    const [resultA] = await Database.execute(queryA, valuesA);
 
-    const subscription = await retrieveSubscription(stripe_subscription_id);
+    if (resultA.length === 0) {
+        res.status(404).json({ data: null, msg: "No active subscription found for the user." });
+        return;
+    }
+
+    const stripeSubscriptionId = resultA[0].stripe_subscription_id;
+
+    const subscription = await retrieveSubscription(stripeSubscriptionId);
     if (!subscription) {
         res.status(400).json({ data: null, msg: "Stripe subscription not found or invalid." });
         return;
@@ -36,23 +45,14 @@ api.post("/subscription/cancel", async function (req, res) {
         return;
     }
 
-    const valuesA = [jwt.id, stripe_subscription_id, subscriptionActive];
-    const queryA = "SELECT stripe_subscription_id FROM subscription WHERE user_id=? AND stripe_subscription_id=? AND status_id=?";
-    const [resultA] = await Database.execute(queryA, valuesA);
-
-    if (resultA.length === 0) {
-        res.status(404).json({ data: null, msg: "No active subscription found for the user." });
-        return;
-    }
-
-    const canceledSubscription = await cancelSubscription(stripe_subscription_id);
+    const canceledSubscription = await cancelSubscription(stripeSubscriptionId);
 
     if (!canceledSubscription) {
         res.status(400).json({ data: null, msg: "Stripe subscription cannot be canceled." });
         return;
     }
 
-    const valuesB = [subscriptionCanceled, stripe_subscription_id];
+    const valuesB = [subscriptionCanceled, stripeSubscriptionId];
     const queryB = "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
     await Database.execute(queryB, valuesB);
 
