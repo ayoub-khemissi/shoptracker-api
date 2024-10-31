@@ -26,44 +26,50 @@ api.post("/register/classical", async function (req, res) {
     }
 
     const valuesA = [email];
-    const queryA = "SELECT 1 FROM user WHERE email=?";
+    const queryA = "SELECT id, disabled FROM user WHERE email=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length > 0) {
-        res.status(409).json({ data: null, msg: "User already exists." });
-        return;
+        const user = resultA[0];
+        if (user.disabled) {
+            const valuesB = [false, user.id];
+            const queryB = "UPDATE user SET disabled=? WHERE id=?";
+            await Database.execute(queryB, valuesB);
+        } else {
+            res.status(409).json({ data: null, msg: "User already exists." });
+            return;
+        }
     }
 
     const passwordSalt = generateSalt();
     const passwordHash = hashPassword(password, passwordSalt);
 
-    const valuesB = [email, passwordSalt, passwordHash, true, true, true, true, Date.now()];
-    const queryB =
-        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    const [resultB] = await Database.execute(queryB, valuesB);
+    const valuesC = [email, passwordSalt, passwordHash, true, true, true, true, Date.now()];
+    const queryC = "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
+    const [resultC] = await Database.execute(queryC, valuesC);
 
-    if (resultB.affectedRows === 0) {
+    if (resultC.affectedRows === 0) {
         res.status(400).json({ data: null, msg: "User not inserted." });
         return;
     }
 
-    const valuesC = [resultB.insertId];
-    const queryC = "SELECT * FROM user WHERE id = ?";
-    const [resultC] = await Database.execute(queryC, valuesC);
+    const valuesD = [resultC.insertId];
+    const queryD = "SELECT * FROM user WHERE id=?";
+    const [resultD] = await Database.execute(queryD, valuesD);
 
-    if (resultC.length === 0) {
+    if (resultD.length === 0) {
         res.status(404).json({ data: null, msg: "User not found." });
         return;
     }
 
-    const user = resultC[0];
+    const user = resultD[0];
 
-    const valuesD = [user.id, subscriptionActive];
-    const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
-    const [resultD] = await Database.execute(queryD, valuesD);
+    const valuesE = [user.id, subscriptionActive];
+    const queryE = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const [resultE] = await Database.execute(queryE, valuesE);
 
-    if (resultD.length > 0) {
-        user.subscription = resultB[0];
+    if (resultE.length > 0) {
+        user.subscription = resultE[0];
 
         const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
         user.subscription = { ...user.subscription, ...subscriptionDetails };

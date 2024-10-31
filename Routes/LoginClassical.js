@@ -28,7 +28,7 @@ api.post("/login/classical", async function (req, res) {
     const queryA = "SELECT * FROM user WHERE email=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
-    if (resultA.length === 0) {
+    if (resultA.length === 0 || resultA[0].disabled) {
         res.status(404).json({ data: null, msg: "Bad credentials." });
         return;
     }

@@ -78,12 +78,18 @@ api.post("/login/google", async function (req, res) {
     } else {
         const user = resultA[0];
 
-        const valuesB = [user.id, subscriptionActive];
-        const queryB = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
-        const [resultB] = await Database.execute(queryB, valuesB);
+        if (user.disabled) {
+            const valuesB = [false, user.id];
+            const queryB = "UPDATE user SET disabled=? WHERE id=?";
+            await Database.execute(queryB, valuesB);
+        }
 
-        if (resultB.length > 0) {
-            user.subscription = resultB[0];
+        const valuesC = [user.id, subscriptionActive];
+        const queryC = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+        const [resultC] = await Database.execute(queryC, valuesC);
+
+        if (resultC.length > 0) {
+            user.subscription = resultC[0];
 
             const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
             user.subscription = { ...user.subscription, ...subscriptionDetails };
