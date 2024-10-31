@@ -33,7 +33,7 @@ api.post("/register/google", async function (req, res) {
         const user = resultA[0];
 
         const valuesB = [user.id, subscriptionActive];
-        const queryB = "SELECT p.stripe_price_id, s.stripe_subscription_id, p.track_check_interval FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+        const queryB = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
         const [resultB] = await Database.execute(queryB, valuesB);
 
         if (resultB.length > 0) {
@@ -44,10 +44,11 @@ api.post("/register/google", async function (req, res) {
         } else {
             user.subscription = {
                 stripe_price_id: null,
+                stripe_subscription_id: null,
                 start_date: null,
                 next_payment_date: null,
                 payment_method: null,
-                payment_history: [],
+                invoice_history: [],
             }
         }
 
@@ -81,7 +82,7 @@ api.post("/register/google", async function (req, res) {
     const user = resultC[0];
 
     const valuesD = [user.id, subscriptionActive];
-    const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id, p.track_check_interval FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultD] = await Database.execute(queryD, valuesD);
 
     if (resultD.length > 0) {
@@ -92,10 +93,11 @@ api.post("/register/google", async function (req, res) {
     } else {
         user.subscription = {
             stripe_price_id: null,
+            stripe_subscription_id: null,
             start_date: null,
             next_payment_date: null,
             payment_method: null,
-            payment_history: [],
+            invoice_history: [],
         }
     }
 
