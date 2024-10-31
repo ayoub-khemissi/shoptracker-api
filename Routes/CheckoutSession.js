@@ -20,10 +20,11 @@ api.post("/checkout/session", async function (req, res) {
         return;
     }
 
-    const { priceId } = req.body;
+    const { stripePriceId } = req.body;
 
-    if (!await retrievePrice(priceId)) {
-        res.status(400).json({ data: null, msg: "Stripe price not found or invalid." });
+    const price = await retrievePrice(stripePriceId);
+    if (!price || !price.active) {
+        res.status(400).json({ data: null, msg: "Stripe price not found or disabled." });
         return;
     }
 
@@ -47,10 +48,10 @@ api.post("/checkout/session", async function (req, res) {
         await Database.execute(queryB, valuesB);
     }
 
-    const session = await createCheckoutSession(user.stripe_customer_id, priceId);
+    const session = await createCheckoutSession(user.stripe_customer_id, stripePriceId);
 
     if (!session) {
-        res.status(500).json({ data: null, msg: "Failed to create checkout session." });
+        res.status(400).json({ data: null, msg: "Failed to create a checkout session." });
         return;
     }
 
