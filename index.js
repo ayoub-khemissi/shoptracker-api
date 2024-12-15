@@ -15,3 +15,7 @@ import "./Routes/SubscriptionCancel.js";
 import "./Routes/AccountDelete.js";
 import "./Routes/StripeWebhook.js";
 import "./Routes/Logout.js";
+import "./Routes/PasswordCodeGenerate.js";
+import "./Routes/PasswordCodeVerify.js";
+import "./Routes/PasswordCodeReset.js";
+import "./Routes/PasswordReset.js";
