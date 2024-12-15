@@ -55,3 +55,17 @@ export function validateBoolean(data) {
 export function validateNumber(data) {
     return typeof data === "number";
 }
+
+/**
+ * Validate whether the given code is in a valid format.
+ *
+ * The code must be a string of exactly 8 characters, consisting of lowercase letters and digits.
+ *
+ * @param {string} code The code to validate.
+ * @param {number} [codeRequiredLength=16] The length of the code required.
+ * @returns {boolean} true if the code is valid, false otherwise.
+ */
+export function validateCode(code, codeRequiredLength = 16) {
+    const codeRegex = new RegExp(`^[0-9a-f]{${codeRequiredLength}}$`);
+    return code && codeRegex.test(code);
+}
