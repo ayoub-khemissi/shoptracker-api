@@ -30,3 +30,13 @@ export function hashPassword(password, salt) {
 
     return crypto.createHmac("sha512", salt).update(password).digest("hex");
 }
+
+/**
+ * Generates a random code of the given size.
+ *
+ * @param {number} [bytesSize=16] The size of the code to generate, in bytes.
+ * @returns {string} The generated code.
+ */
+export function generateCode(bytesSize = 16) {
+    return crypto.randomBytes(bytesSize).toString("hex");
+}
