@@ -20,3 +20,4 @@ import "./Routes/PasswordCodeVerify.js";
 import "./Routes/PasswordCodeReset.js";
 import "./Routes/PasswordReset.js";
 import "./Routes/PhoneUpdate.js";
+import "./Routes/Subscription.js";
