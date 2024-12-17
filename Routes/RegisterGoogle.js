@@ -9,7 +9,7 @@ import Constants from "../Utils/Constants.js";
 import { getSubscriptionDetails } from "../Modules/Stripe.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN } = Config;
-const { jwtExpirationTime, subscriptionActive } = Constants;
+const { jwtExpirationTime, subscriptionActive, cookiesSameSite } = Constants;
 
 api.post("/register/google", async function (req, res) {
     const email = cleanStringData(req.body.email);
@@ -61,7 +61,7 @@ api.post("/register/google", async function (req, res) {
         const jwt = signAuthJwt({ email: user.email, id: user.id });
         const data = clearSensitiveData({ ...user });
 
-        res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: "strict", domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+        res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
         res.status(200).json({ data: data, msg: "User successfully logged in." });
         return;
     }
@@ -110,6 +110,6 @@ api.post("/register/google", async function (req, res) {
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData({ ...user });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: "strict", domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
     res.status(201).json({ data: data, msg: "User successfully created." });
 });
