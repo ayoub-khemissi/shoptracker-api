@@ -8,7 +8,6 @@ import {
 } from "../Modules/DataValidation.js";
 import { cleanStringData } from "../Modules/DataTransformation.js";
 import Constants from "../Utils/Constants.js";
-import { retrieveSubscription } from "../Modules/Stripe.js";
 
 const {
     trackStatusEnabled,
@@ -69,7 +68,7 @@ api.post("/track", async function (req, res) {
 
     const valuesA = [jwt.id, subscriptionActive];
     const queryA =
-        "SELECT s.stripe_subscription_id, p.track_enabled_max_products, p.track_disabled_max_products, p.track_user_max_searches_per_day FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+        "SELECT p.track_enabled_max_products, p.track_disabled_max_products, p.track_user_max_searches_per_day FROM plan p, subscription s WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     const valuesB = [jwt.id, trackStatusEnabled, jwt.id, trackStatusDisabled];
@@ -92,18 +91,11 @@ api.post("/track", async function (req, res) {
     let trackUserMaxSearchesPerDay = defaultTrackUserMaxSearchesPerDay;
 
     if (resultA.length > 0) {
-        const subscription = await retrieveSubscription(resultA[0].stripe_subscription_id);
+        const subscription = resultA[0];
 
-        if (!subscription) {
-            res.status(400).json({ data: null, msg: "Stripe subscription not found or invalid." });
-            return;
-        }
-
-        if (subscription.status === "active") {
-            trackEnabledMaxProducts = resultA[0].track_enabled_max_products;
-            trackDisabledMaxProducts = resultA[0].track_disabled_max_products;
-            trackUserMaxSearchesPerDay = resultA[0].track_user_max_searches_per_day;
-        }
+        trackEnabledMaxProducts = subscription.track_enabled_max_products;
+        trackDisabledMaxProducts = subscription.track_disabled_max_products;
+        trackUserMaxSearchesPerDay = subscription.track_user_max_searches_per_day;
     }
 
     let trackStatus;
