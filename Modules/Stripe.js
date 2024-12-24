@@ -157,7 +157,6 @@ export async function getSubscriptionDetails(subscriptionId) {
             payment_method: paymentMethodText,
             invoice_history: invoiceHistory,
         };
-
     } catch (error) {
         Log.error(`@Stripe:getSubscriptionDetails - Error retrieving subscription details: ${error}`);
         return null;
