@@ -28,8 +28,17 @@ api.patch("/phone/update/", async function (req, res) {
     }
 
     const valuesA = [phone, jwt.id];
-    const queryA = "UPDATE user SET phone=? WHERE id=?";
-    await Database.execute(queryA, valuesA);
+    const queryA = "SELECT 1 FROM user WHERE phone=? AND id!=?";
+    const [resultA] = await Database.execute(queryA, valuesA);
+
+    if (resultA.length > 0) {
+        res.status(409).json({ data: null, msg: "Phone number is already taken." });
+        return;
+    }
+
+    const valuesB = [phone, jwt.id];
+    const queryB = "UPDATE user SET phone=? WHERE id=?";
+    await Database.execute(queryB, valuesB);
 
     res.status(200).json({ data: null, msg: "User phone successfully updated." });
 });
