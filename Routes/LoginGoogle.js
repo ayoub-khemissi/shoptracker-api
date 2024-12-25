@@ -79,8 +79,14 @@ api.post("/login/google", async function (req, res) {
         const user = resultA[0];
 
         if (user.disabled) {
-            const valuesB = [false, user.id];
-            const queryB = "UPDATE user SET disabled=? WHERE id=?";
+            user.disabled = false;
+            user.alert_email = true;
+            user.alert_text = !!user.phone;
+            user.alert_browser_notification = true;
+            user.alert_push_notification = true;
+
+            const valuesB = [user.disabled, user.alert_email, user.alert_text, user.alert_browser_notification, user.alert_push_notification, user.id];
+            const queryB = "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         }
 
