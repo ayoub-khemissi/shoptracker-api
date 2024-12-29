@@ -7,11 +7,7 @@ import Constants from "../Utils/Constants.js";
 const { resetPasswordCodeLength } = Constants;
 
 api.patch("/password/code/reset", async function (req, res) {
-    const {
-        email,
-        resetPasswordCode,
-        newPassword
-    } = req.body;
+    const { email, resetPasswordCode, newPassword } = req.body;
 
     if (!validateEmail(email)) {
         res.status(400).json({ data: null, msg: "Invalid email format." });
@@ -48,7 +44,8 @@ api.patch("/password/code/reset", async function (req, res) {
     const passwordHash = hashPassword(newPassword, passwordSalt);
 
     const valuesB = [passwordHash, passwordSalt, null, Date.now(), email];
-    const queryB = "UPDATE user SET password_hash=?, password_salt=?, reset_password_code=?, updated_at=? WHERE email=?";
+    const queryB =
+        "UPDATE user SET password_hash=?, password_salt=?, reset_password_code=?, updated_at=? WHERE email=?";
     await Database.execute(queryB, valuesB);
 
     res.status(200).json({ data: null, msg: "Password reset successfully." });

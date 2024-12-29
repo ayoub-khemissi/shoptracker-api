@@ -55,5 +55,8 @@ api.post("/checkout/session", async function (req, res) {
         return;
     }
 
-    res.status(200).json({ data: { sessionId: session.id }, msg: "Checkout session successfully created." });
+    res.status(200).json({
+        data: { sessionId: session.id },
+        msg: "Checkout session successfully created.",
+    });
 });

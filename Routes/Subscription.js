@@ -24,14 +24,17 @@ api.get("/subscription", async function (req, res) {
     }
 
     const valuesA = [jwt.id, subscriptionActive];
-    const queryA = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const queryA =
+        "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     let subscription = null;
     if (resultA.length > 0) {
         subscription = resultA[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(subscription.stripe_subscription_id);
+        const subscriptionDetails = await getSubscriptionDetails(
+            subscription.stripe_subscription_id,
+        );
         subscription = { ...subscription, ...subscriptionDetails };
     } else {
         subscription = {
@@ -41,7 +44,7 @@ api.get("/subscription", async function (req, res) {
             next_payment_date: null,
             payment_method: null,
             invoice_history: [],
-        }
+        };
     }
 
     res.status(200).json({ data: subscription, msg: "Subscription successfully found." });

@@ -24,7 +24,8 @@ api.delete("/subscription/cancel", async function (req, res) {
     }
 
     const valuesA = [jwt.id, subscriptionActive];
-    const queryA = "SELECT stripe_subscription_id FROM subscription WHERE user_id=? AND status_id=?";
+    const queryA =
+        "SELECT stripe_subscription_id FROM subscription WHERE user_id=? AND status_id=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length === 0) {

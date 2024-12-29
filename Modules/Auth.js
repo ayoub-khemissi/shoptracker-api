@@ -27,7 +27,10 @@ export function verifyAuthJwt(authJwt) {
  */
 export function signAuthJwt(authPayload) {
     try {
-        return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, { algorithm: "HS512", expiresIn: jwtExpirationTime });
+        return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, {
+            algorithm: "HS512",
+            expiresIn: jwtExpirationTime,
+        });
     } catch (error) {
         return null;
     }

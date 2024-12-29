@@ -1,10 +1,7 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import {
-    validateBoolean,
-    validateNumber
-} from "../Modules/DataValidation.js";
+import { validateBoolean, validateNumber } from "../Modules/DataValidation.js";
 
 api.patch("/track/update", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -60,12 +57,7 @@ api.patch("/track/update", async function (req, res) {
         return;
     }
 
-    const valuesB = [
-        trackStock,
-        trackPrice,
-        trackPriceThreshold,
-        id
-    ];
+    const valuesB = [trackStock, trackPrice, trackPriceThreshold, id];
     const queryB =
         "UPDATE track SET track_stock=?, track_price=?, track_price_threshold=? WHERE id=?";
     await Database.execute(queryB, valuesB);

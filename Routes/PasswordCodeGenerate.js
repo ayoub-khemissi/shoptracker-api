@@ -33,7 +33,7 @@ api.post("/password/code/generate", async function (req, res) {
 
     const emailBody = formatBodyForResetPassword(resetPasswordCode);
 
-    if (!await sendEmail(email, "🔒 Reset password", emailBody)) {
+    if (!(await sendEmail(email, "🔒 Reset password", emailBody))) {
         res.status(500).json({ data: null, msg: "Email not sent." });
         return;
     }

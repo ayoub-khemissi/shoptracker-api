@@ -4,11 +4,7 @@ import Database from "../Modules/Database.js";
 import { validateNumber } from "../Modules/DataValidation.js";
 import Constants from "../Utils/Constants.js";
 
-const {
-    trackStatusEnabled,
-    subscriptionActive,
-    defaultTrackEnabledMaxProducts
-} = Constants;
+const { trackStatusEnabled, subscriptionActive, defaultTrackEnabledMaxProducts } = Constants;
 
 api.patch("/track/enable", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -44,7 +40,10 @@ api.patch("/track/enable", async function (req, res) {
     }
 
     if (resultA[0].status_id === trackStatusEnabled) {
-        res.status(409).json({ data: null, msg: "Track enable request denied, track already enabled." });
+        res.status(409).json({
+            data: null,
+            msg: "Track enable request denied, track already enabled.",
+        });
         return;
     }
 
@@ -65,7 +64,10 @@ api.patch("/track/enable", async function (req, res) {
     }
 
     if (resultC[0].total_tracks_enabled >= trackEnabledMaxProducts) {
-        res.status(403).json({ data: null, msg: `Track enable request denied, reached tracklist max products limit: ${trackEnabledMaxProducts}` });
+        res.status(403).json({
+            data: null,
+            msg: `Track enable request denied, reached tracklist max products limit: ${trackEnabledMaxProducts}`,
+        });
         return;
     }
 

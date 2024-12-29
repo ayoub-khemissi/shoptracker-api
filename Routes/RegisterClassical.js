@@ -39,8 +39,16 @@ api.post("/register/classical", async function (req, res) {
             user.alert_browser_notification = true;
             user.alert_push_notification = true;
 
-            const valuesB = [user.disabled, user.alert_email, user.alert_text, user.alert_browser_notification, user.alert_push_notification, user.id];
-            const queryB = "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
+            const valuesB = [
+                user.disabled,
+                user.alert_email,
+                user.alert_text,
+                user.alert_browser_notification,
+                user.alert_push_notification,
+                user.id,
+            ];
+            const queryB =
+                "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         } else {
             res.status(409).json({ data: null, msg: "User already exists." });
@@ -52,7 +60,8 @@ api.post("/register/classical", async function (req, res) {
     const passwordHash = hashPassword(password, passwordSalt);
 
     const valuesC = [email, passwordSalt, passwordHash, true, false, true, true, Date.now()];
-    const queryC = "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
+    const queryC =
+        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);
 
     if (resultC.affectedRows === 0) {
@@ -72,13 +81,16 @@ api.post("/register/classical", async function (req, res) {
     const user = resultD[0];
 
     const valuesE = [user.id, subscriptionActive];
-    const queryE = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const queryE =
+        "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultE] = await Database.execute(queryE, valuesE);
 
     if (resultE.length > 0) {
         user.subscription = resultE[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+        const subscriptionDetails = await getSubscriptionDetails(
+            user.subscription.stripe_subscription_id,
+        );
         user.subscription = { ...user.subscription, ...subscriptionDetails };
     } else {
         user.subscription = {
@@ -88,12 +100,18 @@ api.post("/register/classical", async function (req, res) {
             next_payment_date: null,
             payment_method: null,
             invoice_history: [],
-        }
+        };
     }
 
-    const jwt = signAuthJwt({ email: user.email, id: user.id })
+    const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData({ ...user });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, {
+        httpOnly: true,
+        secure: SHOPTRACKER_FRONT_HTTPSECURE,
+        sameSite: cookiesSameSite,
+        domain: SHOPTRACKER_FRONT_DOMAIN,
+        maxAge: jwtExpirationTime,
+    });
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

@@ -2,14 +2,20 @@ import Stripe from "stripe";
 import Config from "../Utils/Config.js";
 import Log from "./Log.js";
 
-const { STRIPE_API_KEY, STRIPE_WEBHOOK_KEY, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_HTTPSECURE } = Config;
+const {
+    STRIPE_API_KEY,
+    STRIPE_WEBHOOK_KEY,
+    SHOPTRACKER_FRONT_PORT,
+    SHOPTRACKER_FRONT_HOSTNAME,
+    SHOPTRACKER_FRONT_HTTPSECURE,
+} = Config;
 
 const stripe = new Stripe(STRIPE_API_KEY);
 
 export async function createCustomer(customerData) {
     try {
         return await stripe.customers.create({
-            ...customerData
+            ...customerData,
         });
     } catch (error) {
         Log.error(`@Stripe:createCustomer - Error creating customer: ${error}`);
@@ -38,7 +44,7 @@ export async function retrieveCustomer(customerId) {
 export async function cancelSubscription(subscriptionId) {
     try {
         return await stripe.subscriptions.cancel(subscriptionId, {
-            prorate: true
+            prorate: true,
         });
     } catch (error) {
         Log.error(`@Stripe:cancelSubscription - Error canceling subscription: ${error}`);
@@ -49,10 +55,12 @@ export async function cancelSubscription(subscriptionId) {
 export async function updateSubscription(subscriptionId, newPriceId) {
     try {
         return await stripe.subscriptions.update(subscriptionId, {
-            items: [{
-                id: subscriptionId,
-                price: newPriceId,
-            }]
+            items: [
+                {
+                    id: subscriptionId,
+                    price: newPriceId,
+                },
+            ],
         });
     } catch (error) {
         Log.error(`@Stripe:updateSubscription - Error updating subscription: ${error}`);
@@ -84,7 +92,7 @@ export async function createCheckoutSession(customerId, priceId) {
             mode: "subscription",
             success_url: `${frontBaseUrl}/settings?tab=subscription`,
             cancel_url: `${frontBaseUrl}/pricing`,
-            customer: customerId
+            customer: customerId,
         });
     } catch (error) {
         Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
@@ -116,7 +124,9 @@ export async function getSubscriptionDetails(subscriptionId) {
 
         let paymentMethodText = null;
         if (subscription.default_payment_method) {
-            const paymentMethod = await stripe.paymentMethods.retrieve(subscription.default_payment_method);
+            const paymentMethod = await stripe.paymentMethods.retrieve(
+                subscription.default_payment_method,
+            );
 
             switch (paymentMethod?.type) {
                 case "card":
@@ -129,7 +139,9 @@ export async function getSubscriptionDetails(subscriptionId) {
                     paymentMethodText = "SEPA";
                     break;
                 default:
-                    paymentMethodText = paymentMethod.type?.toLocaleUpperCase().replaceAll("_", " ");
+                    paymentMethodText = paymentMethod.type
+                        ?.toLocaleUpperCase()
+                        .replaceAll("_", " ");
                     break;
             }
         }
@@ -137,16 +149,18 @@ export async function getSubscriptionDetails(subscriptionId) {
         const invoices = await stripe.invoices.list({
             subscription: subscriptionId,
             limit: 6,
-            status: 'paid',
+            status: "paid",
         });
 
-        const invoiceHistory = invoices.data.filter(invoice => invoice.amount_paid > 0 || invoice.amount_paid < 0).map(invoice => ({
-            number: invoice.number,
-            date: invoice.created * 1000,
-            amount: (invoice.amount_paid / 100).toFixed(2),
-            currency: invoice.currency,
-            url: invoice.hosted_invoice_url
-        }));
+        const invoiceHistory = invoices.data
+            .filter((invoice) => invoice.amount_paid > 0 || invoice.amount_paid < 0)
+            .map((invoice) => ({
+                number: invoice.number,
+                date: invoice.created * 1000,
+                amount: (invoice.amount_paid / 100).toFixed(2),
+                currency: invoice.currency,
+                url: invoice.hosted_invoice_url,
+            }));
 
         const startDate = subscription.start_date * 1000;
         const nextPaymentDate = subscription.current_period_end * 1000;
@@ -158,7 +172,9 @@ export async function getSubscriptionDetails(subscriptionId) {
             invoice_history: invoiceHistory,
         };
     } catch (error) {
-        Log.error(`@Stripe:getSubscriptionDetails - Error retrieving subscription details: ${error}`);
+        Log.error(
+            `@Stripe:getSubscriptionDetails - Error retrieving subscription details: ${error}`,
+        );
         return null;
     }
 }

@@ -39,19 +39,30 @@ api.post("/register/google", async function (req, res) {
             user.alert_browser_notification = true;
             user.alert_push_notification = true;
 
-            const valuesB = [user.disabled, user.alert_email, user.alert_text, user.alert_browser_notification, user.alert_push_notification, user.id];
-            const queryB = "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
+            const valuesB = [
+                user.disabled,
+                user.alert_email,
+                user.alert_text,
+                user.alert_browser_notification,
+                user.alert_push_notification,
+                user.id,
+            ];
+            const queryB =
+                "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         }
 
         const valuesC = [user.id, subscriptionActive];
-        const queryC = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+        const queryC =
+            "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
         const [resultC] = await Database.execute(queryC, valuesC);
 
         if (resultC.length > 0) {
             user.subscription = resultC[0];
 
-            const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+            const subscriptionDetails = await getSubscriptionDetails(
+                user.subscription.stripe_subscription_id,
+            );
             user.subscription = { ...user.subscription, ...subscriptionDetails };
         } else {
             user.subscription = {
@@ -61,13 +72,19 @@ api.post("/register/google", async function (req, res) {
                 next_payment_date: null,
                 payment_method: null,
                 invoice_history: [],
-            }
+            };
         }
 
         const jwt = signAuthJwt({ email: user.email, id: user.id });
         const data = clearSensitiveData({ ...user });
 
-        res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+        res.cookie("jwt", jwt, {
+            httpOnly: true,
+            secure: SHOPTRACKER_FRONT_HTTPSECURE,
+            sameSite: cookiesSameSite,
+            domain: SHOPTRACKER_FRONT_DOMAIN,
+            maxAge: jwtExpirationTime,
+        });
         res.status(200).json({ data: data, msg: "User successfully logged in." });
         return;
     }
@@ -94,13 +111,16 @@ api.post("/register/google", async function (req, res) {
     const user = resultC[0];
 
     const valuesD = [user.id, subscriptionActive];
-    const queryD = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const queryD =
+        "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultD] = await Database.execute(queryD, valuesD);
 
     if (resultD.length > 0) {
         user.subscription = resultB[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+        const subscriptionDetails = await getSubscriptionDetails(
+            user.subscription.stripe_subscription_id,
+        );
         user.subscription = { ...user.subscription, ...subscriptionDetails };
     } else {
         user.subscription = {
@@ -110,12 +130,18 @@ api.post("/register/google", async function (req, res) {
             next_payment_date: null,
             payment_method: null,
             invoice_history: [],
-        }
+        };
     }
 
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData({ ...user });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, {
+        httpOnly: true,
+        secure: SHOPTRACKER_FRONT_HTTPSECURE,
+        sameSite: cookiesSameSite,
+        domain: SHOPTRACKER_FRONT_DOMAIN,
+        maxAge: jwtExpirationTime,
+    });
     res.status(201).json({ data: data, msg: "User successfully created." });
 });

@@ -8,7 +8,7 @@ const {
     trackStatusDisabled,
     trackStatusEnabled,
     subscriptionActive,
-    defaultTrackDisabledMaxProducts
+    defaultTrackDisabledMaxProducts,
 } = Constants;
 
 api.patch("/track/disable", async function (req, res) {
@@ -45,7 +45,10 @@ api.patch("/track/disable", async function (req, res) {
     }
 
     if (resultA[0].status_id !== trackStatusEnabled) {
-        res.status(403).json({ data: null, msg: "Track disable request denied, track is not enabled so you cannot disable it." });
+        res.status(403).json({
+            data: null,
+            msg: "Track disable request denied, track is not enabled so you cannot disable it.",
+        });
         return;
     }
 
@@ -66,7 +69,10 @@ api.patch("/track/disable", async function (req, res) {
     }
 
     if (resultC[0].total_tracks_disabled >= trackDisabledMaxProducts) {
-        res.status(403).json({ data: null, msg: `Track disable request denied, reached tracklist max products limit: ${trackDisabledMaxProducts}` });
+        res.status(403).json({
+            data: null,
+            msg: `Track disable request denied, reached tracklist max products limit: ${trackDisabledMaxProducts}`,
+        });
         return;
     }
 

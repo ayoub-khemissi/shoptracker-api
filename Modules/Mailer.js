@@ -2,7 +2,13 @@ import nodemailer from "nodemailer";
 import Log from "./Log.js";
 import Config from "../Utils/Config.js";
 
-const { SHOPTRACKER_MAILER_HOST, SHOPTRACKER_MAILER_PORT, SHOPTRACKER_MAILER_USER, SHOPTRACKER_MAILER_PASSWORD, SHOPTRACKER_MAILER_DEFAULT_MAIL } = Config;
+const {
+    SHOPTRACKER_MAILER_HOST,
+    SHOPTRACKER_MAILER_PORT,
+    SHOPTRACKER_MAILER_USER,
+    SHOPTRACKER_MAILER_PASSWORD,
+    SHOPTRACKER_MAILER_DEFAULT_MAIL,
+} = Config;
 
 const transporter = nodemailer.createTransport({
     host: SHOPTRACKER_MAILER_HOST,
@@ -10,8 +16,8 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         user: SHOPTRACKER_MAILER_USER,
-        pass: SHOPTRACKER_MAILER_PASSWORD
-    }
+        pass: SHOPTRACKER_MAILER_PASSWORD,
+    },
 });
 
 export const sendEmail = async (to, subject, html, service = "Support") => {

@@ -45,13 +45,16 @@ api.post("/login/classical", async function (req, res) {
     }
 
     const valuesB = [user.id, subscriptionActive];
-    const queryB = "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
+    const queryB =
+        "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     if (resultB.length > 0) {
         user.subscription = resultB[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(user.subscription.stripe_subscription_id);
+        const subscriptionDetails = await getSubscriptionDetails(
+            user.subscription.stripe_subscription_id,
+        );
         user.subscription = { ...user.subscription, ...subscriptionDetails };
     } else {
         user.subscription = {
@@ -61,12 +64,18 @@ api.post("/login/classical", async function (req, res) {
             next_payment_date: null,
             payment_method: null,
             invoice_history: [],
-        }
+        };
     }
 
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData({ ...user });
 
-    res.cookie("jwt", jwt, { httpOnly: true, secure: SHOPTRACKER_FRONT_HTTPSECURE, sameSite: cookiesSameSite, domain: SHOPTRACKER_FRONT_DOMAIN, maxAge: jwtExpirationTime });
+    res.cookie("jwt", jwt, {
+        httpOnly: true,
+        secure: SHOPTRACKER_FRONT_HTTPSECURE,
+        sameSite: cookiesSameSite,
+        domain: SHOPTRACKER_FRONT_DOMAIN,
+        maxAge: jwtExpirationTime,
+    });
     res.status(200).json({ data: data, msg: "User successfully logged in." });
 });

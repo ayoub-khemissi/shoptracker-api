@@ -11,6 +11,8 @@ const resetPasswordCodePlaceholder = "{{RESET_PASSWORD_CODE}}";
  * @returns {string} The formatted email body.
  */
 export const formatBodyForResetPassword = (resetPasswordCode) => {
-    const template = fs.readFileSync(`${mailTemplatesPath}/mail_template_reset_password.html`, "utf-8").toString();
+    const template = fs
+        .readFileSync(`${mailTemplatesPath}/mail_template_reset_password.html`, "utf-8")
+        .toString();
     return template.replaceAll(resetPasswordCodePlaceholder, resetPasswordCode);
 };

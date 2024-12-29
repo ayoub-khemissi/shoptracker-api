@@ -32,7 +32,8 @@ api.patch("/password/reset", async function (req, res) {
     const passwordHash = hashPassword(newPassword, passwordSalt);
 
     const valuesB = [passwordHash, passwordSalt, null, Date.now(), jwt.id];
-    const queryB = "UPDATE user SET password_hash=?, password_salt=?, reset_password_code=?, updated_at=? WHERE id=?";
+    const queryB =
+        "UPDATE user SET password_hash=?, password_salt=?, reset_password_code=?, updated_at=? WHERE id=?";
     await Database.execute(queryB, valuesB);
 
     res.status(200).json({ data: null, msg: "Password reset successfully." });

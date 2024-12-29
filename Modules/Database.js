@@ -1,7 +1,13 @@
 import mysql from "mysql2";
 import Config from "../Utils/Config.js";
 
-const { SHOPTRACKER_DB_HOST, SHOPTRACKER_DB_PORT, SHOPTRACKER_DB_USER, SHOPTRACKER_DB_PASSWORD, SHOPTRACKER_DB_DATABASE } = Config;
+const {
+    SHOPTRACKER_DB_HOST,
+    SHOPTRACKER_DB_PORT,
+    SHOPTRACKER_DB_USER,
+    SHOPTRACKER_DB_PASSWORD,
+    SHOPTRACKER_DB_DATABASE,
+} = Config;
 
 const pool = mysql.createPool({
     host: SHOPTRACKER_DB_HOST,

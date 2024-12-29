@@ -1,11 +1,7 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import {
-    validateBoolean,
-    validateNumber,
-    validateUrl,
-} from "../Modules/DataValidation.js";
+import { validateBoolean, validateNumber, validateUrl } from "../Modules/DataValidation.js";
 import { cleanStringData } from "../Modules/DataTransformation.js";
 import Constants from "../Utils/Constants.js";
 
@@ -16,7 +12,7 @@ const {
     defaultTrackDisabledMaxProducts,
     defaultTrackUserMaxSearchesPerDay,
     trackExtractionRuleFull,
-    subscriptionActive
+    subscriptionActive,
 } = Constants;
 
 api.post("/track", async function (req, res) {
@@ -82,8 +78,7 @@ api.post("/track", async function (req, res) {
     const [resultC] = await Database.execute(queryC, valuesC);
 
     const valuesD = [jwt.id, url, trackStatusEnabled, trackStatusDisabled];
-    const queryD =
-        "SELECT 1 FROM track WHERE user_id=? AND url=? AND status_id IN (?, ?)";
+    const queryD = "SELECT 1 FROM track WHERE user_id=? AND url=? AND status_id IN (?, ?)";
     const [resultD] = await Database.execute(queryD, valuesD);
 
     let trackEnabledMaxProducts = defaultTrackEnabledMaxProducts;
@@ -101,7 +96,10 @@ api.post("/track", async function (req, res) {
     let trackStatus;
     if (resultB[0].total_tracks_enabled >= trackEnabledMaxProducts) {
         if (resultB[0].total_tracks_disabled >= trackDisabledMaxProducts) {
-            res.status(403).json({ data: null, msg: `Track request denied, reached tracklist max products limit: ${trackDisabledMaxProducts}` });
+            res.status(403).json({
+                data: null,
+                msg: `Track request denied, reached tracklist max products limit: ${trackDisabledMaxProducts}`,
+            });
             return;
         } else {
             trackStatus = trackStatusDisabled;
@@ -111,12 +109,18 @@ api.post("/track", async function (req, res) {
     }
 
     if (resultC[0].total_tracks_today >= trackUserMaxSearchesPerDay) {
-        res.status(403).json({ data: null, msg: `Track request denied, reached user max searches per day limit: ${trackUserMaxSearchesPerDay}` });
+        res.status(403).json({
+            data: null,
+            msg: `Track request denied, reached user max searches per day limit: ${trackUserMaxSearchesPerDay}`,
+        });
         return;
     }
 
     if (resultD.length > 0) {
-        res.status(409).json({ data: null, msg: "Track request denied, product already in tracklist." });
+        res.status(409).json({
+            data: null,
+            msg: "Track request denied, product already in tracklist.",
+        });
         return;
     }
 

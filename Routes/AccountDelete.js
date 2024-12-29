@@ -36,7 +36,8 @@ api.delete("/account/delete/", async function (req, res) {
     await Database.execute(queryB, valuesB);
 
     const valuesC = [false, false, false, false, true, Date.now(), jwt.id];
-    const queryC = "UPDATE user SET alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, disabled=?, updated_at=? WHERE id=?";
+    const queryC =
+        "UPDATE user SET alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, disabled=?, updated_at=? WHERE id=?";
     await Database.execute(queryC, valuesC);
 
     res.status(200).json({ data: null, msg: "User account successfully deleted." });
