@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const {
     SHOPTRACKER_FRONT_DOMAIN,
     SHOPTRACKER_FRONT_HOSTNAME,
