@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #fffaee;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #1e1e25;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #fffaee;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #fffaee;
+            line-height: 1.2;
+        }
+
+        p, ul, li {
+            color: #fffaee;
+        }
+
+        .plan-details {
+            background-color: #2a2a35;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .plan-details p {
+            margin: 5px 0;
+        }
+
+        .features {
+            background-color: #2a2a35;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .features ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .features li {
+            margin: 8px 0;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #ffa217;
+        }
+
+        a {
+            color: #ffa217;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎉 Welcome to Your New Plan!</h1>
+        <p>Hi there,</p>
+        <p>
+            Thank you for choosing ShopTracker! We're excited to have you on board with our <strong>{{PLAN_NAME}}</strong> 🚀
+        </p>
+        <div class="plan-details">
+            <p><strong>Plan Details:</strong></p>
+            <p>📅 Start Date: {{START_DATE}}</p>
+            <p>🔄 Next Payment: {{NEXT_PAYMENT_DATE}}</p>
+            <p>💳 Payment Method: {{PAYMENT_METHOD}}</p>
+            <p>💰 Price: {{PRICE}} {{CURRENCY}}/{{BILLING_PERIOD}}</p>
+        </div>
+        <div class="features">
+            <p><strong>Your Plan Features:</strong></p>
+            <ul>
+                <li>📊 Track up to {{MAX_PRODUCTS}} products at a time</li>
+                <li>⏰ Check prices and availability every {{CHECK_INTERVAL}}</li>
+                <li>❤️ Add up to {{MAX_WISHLIST_PRODUCTS}} products to your wishlist</li>
+                <li>🔍 Perform {{MAX_SEARCHES_PER_DAY}} searches per day</li>
+            </ul>
+        </div>
+        <div class="footer">
+            <p>
+                ❓ Need help getting started? Check out our <a href="{{FRONT_URL}}/faq">documentation</a> or <a
+                    href="mailto:{{SUPPORT_EMAIL}}">contact our support team</a>.
+            </p>
+            <p>✨ Happy tracking!<br />The ShopTracker Team</p>
+        </div>
+    </div>
+</body>
+
+</html>

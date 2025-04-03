@@ -170,6 +170,8 @@ export async function getSubscriptionDetails(subscriptionId) {
             next_payment_date: nextPaymentDate,
             payment_method: paymentMethodText,
             invoice_history: invoiceHistory,
+            billing_period: subscription.items.data[0].price.recurring.interval,
+            currency: subscription.items.data[0].price.currency
         };
     } catch (error) {
         Log.error(

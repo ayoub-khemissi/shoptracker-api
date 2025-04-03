@@ -1,7 +1,9 @@
 import api from "../Modules/Api.js";
 import Database from "../Modules/Database.js";
 import Log from "../Modules/Log.js";
-import { cancelSubscription, constructEvent } from "../Modules/Stripe.js";
+import { cancelSubscription, constructEvent, getSubscriptionDetails } from "../Modules/Stripe.js";
+import { sendEmail } from "../Modules/Mailer.js";
+import { formatBodyForSubscriptionConfirmation } from "../Modules/ServicesMailFormatter.js";
 import Constants from "../Utils/Constants.js";
 
 const { subscriptionActive, subscriptionCanceled } = Constants;
@@ -23,7 +25,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 const priceId = subscription.items.data[0].price.id;
 
                 const valuesA = [subscription.customer];
-                const queryA = "SELECT id FROM user WHERE stripe_customer_id=?";
+                const queryA = "SELECT id, email FROM user WHERE stripe_customer_id=?";
                 const [resultA] = await Database.execute(queryA, valuesA);
 
                 if (resultA.length === 0) {
@@ -51,11 +53,13 @@ api.post("/stripe/webhook", async function (req, res) {
                         Log.error(
                             `/stripe-webhook:customer.subscription.created - Old subscription failed to cancel subscription=${sub.stripe_subscription_id} for user=${user.id}-${user.email}`,
                         );
+                        res.sendStatus(400);
+                        return;
                     }
                 }
 
                 const valuesD = [priceId];
-                const queryD = "SELECT id FROM plan WHERE stripe_price_id=?";
+                const queryD = "SELECT id, name, price, track_enabled_max_products, track_disabled_max_products, track_check_interval, track_user_max_searches_per_day FROM plan WHERE stripe_price_id=?";
                 const [resultD] = await Database.execute(queryD, valuesD);
 
                 if (resultD.length === 0) {
@@ -77,7 +81,30 @@ api.post("/stripe/webhook", async function (req, res) {
                     Log.error(
                         `/stripe-webhook:customer.subscription.created - Subscription failed to insert in database subscription=${subscription.id} for user=${user.id}-${user.email}`,
                     );
+                    res.sendStatus(400);
+                    return;
                 }
+
+                // Get subscription details for email
+                const subscriptionDetails = await getSubscriptionDetails(subscription.id);
+
+                if (!subscriptionDetails) {
+                    Log.error(
+                        `/stripe-webhook:customer.subscription.created - Subscription failed to get subscription details subscription=${subscription.id} for user=${user.id}-${user.email}`,
+                    );
+                    res.sendStatus(400);
+                    return;
+                }
+
+                // Format and send confirmation email
+                const emailBody = formatBodyForSubscriptionConfirmation(plan, subscriptionDetails);
+
+                await sendEmail(
+                    user.email,
+                    "Welcome to Your New ShopTracker Plan! 🎉",
+                    emailBody,
+                    "Subscription"
+                );
             }
             break;
 
