@@ -8,8 +8,8 @@ import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 import { getSubscriptionDetails } from "../Modules/Stripe.js";
 
-const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN } = Config;
-const { jwtExpirationTime, subscriptionActive, cookiesSameSite } = Constants;
+const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
+const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/login/classical", async function (req, res) {
     const { email, password } = req.body;
@@ -73,7 +73,7 @@ api.post("/login/classical", async function (req, res) {
     res.cookie("jwt", jwt, {
         httpOnly: true,
         secure: SHOPTRACKER_FRONT_HTTPSECURE,
-        sameSite: cookiesSameSite,
+        sameSite: SHOPTRACKER_COOKIES_SAME_SITE,
         domain: SHOPTRACKER_FRONT_DOMAIN,
         maxAge: jwtExpirationTime,
     });

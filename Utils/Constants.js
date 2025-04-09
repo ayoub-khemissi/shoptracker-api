@@ -24,8 +24,6 @@ const Constants = {
 
     resetPasswordCodeLength: 16,
 
-    cookiesSameSite: "lax",
-
     logLevelDebug: 1,
     logLevelInfo: 2,
     logLevelWarn: 3,
