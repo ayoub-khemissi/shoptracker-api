@@ -7,25 +7,38 @@ import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformati
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 import { getSubscriptionDetails } from "../Modules/Stripe.js";
+import { verifyRecaptchaToken } from "../Modules/GoogleRecaptcha.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
 const { jwtExpirationTime, subscriptionActive } = Constants;
 
 api.post("/register/classical", async function (req, res) {
-    const email = cleanStringData(req.body.email);
-    const password = cleanStringData(req.body.password);
+    const { email, password, recaptchaToken } = req.body;
 
-    if (!validateEmail(email)) {
+    if (!recaptchaToken) {
+        res.status(400).json({ data: null, msg: "reCAPTCHA token is required." });
+        return;
+    }
+
+    if (!(await verifyRecaptchaToken(recaptchaToken))) {
+        res.status(400).json({ data: null, msg: "Invalid reCAPTCHA token" });
+        return;
+    }
+
+    const cleanEmail = cleanStringData(email);
+    const cleanPassword = cleanStringData(password);
+
+    if (!validateEmail(cleanEmail)) {
         res.status(400).json({ data: null, msg: "Invalid email format." });
         return;
     }
 
-    if (!validatePassword(password)) {
+    if (!validatePassword(cleanPassword)) {
         res.status(400).json({ data: null, msg: "Invalid password format." });
         return;
     }
 
-    const valuesA = [email];
+    const valuesA = [cleanEmail];
     const queryA = "SELECT id, disabled FROM user WHERE email=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
@@ -57,9 +70,9 @@ api.post("/register/classical", async function (req, res) {
     }
 
     const passwordSalt = generateSalt();
-    const passwordHash = hashPassword(password, passwordSalt);
+    const passwordHash = hashPassword(cleanPassword, passwordSalt);
 
-    const valuesC = [email, passwordSalt, passwordHash, true, false, true, true, Date.now()];
+    const valuesC = [cleanEmail, passwordSalt, passwordHash, true, false, true, true, Date.now()];
     const queryC =
         "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);

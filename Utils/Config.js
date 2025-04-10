@@ -32,6 +32,8 @@ const {
 
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
+    GOOGLE_RECAPTCHA_SECRET_KEY,
+
     // eslint-disable-next-line no-undef
 } = process.env;
 
@@ -69,6 +71,7 @@ const Config = {
 
     GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: GOOGLE_CLIENT_SECRET,
+    GOOGLE_RECAPTCHA_SECRET_KEY: GOOGLE_RECAPTCHA_SECRET_KEY,
 };
 
 export default Config;
