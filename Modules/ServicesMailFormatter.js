@@ -6,10 +6,14 @@ import Config from "../Utils/Config.js";
 const { mailTemplatesPath } = Constants;
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_MAILER_DEFAULT_MAIL } = Config;
 
-// Reset password email placeholders
 const resetPasswordCodePlaceholder = "{{RESET_PASSWORD_CODE}}";
 
-// Subscription confirmation email placeholders
+const contactFormPlaceholders = {
+    email: "{{EMAIL}}",
+    subject: "{{SUBJECT}}",
+    content: "{{CONTENT}}"
+};
+
 const subscriptionPlaceholders = {
     planName: "{{PLAN_NAME}}",
     startDate: "{{START_DATE}}",
@@ -26,7 +30,6 @@ const subscriptionPlaceholders = {
     supportEmail: "{{SUPPORT_EMAIL}}"
 };
 
-// Date formatting options
 const dateFormatOptions = {
     weekday: 'long',
     year: 'numeric',
@@ -57,20 +60,15 @@ export const formatBodyForSubscriptionConfirmation = (plan, subscriptionDetails)
         .readFileSync(`${mailTemplatesPath}/mail_template_subscription_confirmation.html`, "utf-8")
         .toString();
 
-    // Format dates
     const startDate = new Date(subscriptionDetails.start_date).toLocaleDateString('en-GB', dateFormatOptions);
     const nextPaymentDate = new Date(subscriptionDetails.next_payment_date).toLocaleDateString('en-GB', dateFormatOptions);
 
-    // Format check interval
     const checkInterval = convertMillisecondsToText(plan.track_check_interval);
 
-    // Format frontend URL
     const frontUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
 
-    // Format price
     const formattedPrice = formatPrice((subscriptionDetails.invoice_history[0].amount));
 
-    // Replace template variables
     return template
         .replace(subscriptionPlaceholders.planName, plan.name)
         .replace(subscriptionPlaceholders.startDate, startDate)
@@ -85,4 +83,22 @@ export const formatBodyForSubscriptionConfirmation = (plan, subscriptionDetails)
         .replace(subscriptionPlaceholders.maxSearchesPerDay, plan.track_user_max_searches_per_day)
         .replace(subscriptionPlaceholders.frontUrl, frontUrl)
         .replace(subscriptionPlaceholders.supportEmail, SHOPTRACKER_MAILER_DEFAULT_MAIL);
+};
+
+/**
+ * Formats the body of a contact form email using the email template.
+ * @param {string} email - The email address of the sender.
+ * @param {string} subject - The subject of the contact form.
+ * @param {string} content - The content of the contact form.
+ * @returns {string} The formatted email body.
+ */
+export const formatBodyForContactForm = (email, subject, content) => {
+    const template = fs
+        .readFileSync(`${mailTemplatesPath}/mail_template_contact_form.html`, "utf-8")
+        .toString();
+
+    return template
+        .replace(contactFormPlaceholders.email, email)
+        .replace(contactFormPlaceholders.subject, subject)
+        .replace(contactFormPlaceholders.content, content);
 };
