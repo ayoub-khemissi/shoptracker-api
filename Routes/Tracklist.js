@@ -1,6 +1,9 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
+import Constants from "../Utils/Constants.js";
+
+const { trackStatusDeleted } = Constants;
 
 api.get("/tracklist", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -19,9 +22,9 @@ api.get("/tracklist", async function (req, res) {
         return;
     }
 
-    const valuesA = [jwt.id];
+    const valuesA = [jwt.id, trackStatusDeleted];
     const queryA =
-        "SELECT t.id, t.url, t.name, t.description, t.currency, t.additional_info, t.track_stock, t.track_price, t.track_price_threshold, t.status_id, t.created_at, t.updated_at, (SELECT tco.price FROM track_check_ok tco WHERE tco.track_id = t.id ORDER BY tco.created_at ASC LIMIT 1) AS initial_price, (SELECT tco.availability FROM track_check_ok tco WHERE tco.track_id = t.id ORDER BY tco.created_at ASC LIMIT 1) AS availability FROM track t WHERE t.user_id = ?";
+        "SELECT t.id, t.url, t.name, t.description, t.currency, t.additional_info, t.track_stock, t.track_price, t.track_price_threshold, t.status_id, t.created_at, t.updated_at, (SELECT tco.price FROM track_check_ok tco WHERE tco.track_id = t.id ORDER BY tco.created_at ASC LIMIT 1) AS initial_price, (SELECT tco.availability FROM track_check_ok tco WHERE tco.track_id = t.id ORDER BY tco.created_at ASC LIMIT 1) AS availability FROM track t WHERE t.user_id = ? AND t.status_id <> ?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     for (const track of resultA) {
