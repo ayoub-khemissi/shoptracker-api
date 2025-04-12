@@ -82,3 +82,51 @@ export function validatePhone(phone) {
     const phoneRegex = /^\+\d{10,15}$/;
     return phone && phoneRegex.test(phone);
 }
+
+/**
+ * Validate whether the given data is a string.
+ *
+ * @param {*} data The data to validate.
+ * @returns {boolean} true if the data is a string, false otherwise.
+ */
+export function validateString(data) {
+    return typeof data === "string";
+}
+
+/**
+ * Validate whether the given data is an object.
+ *
+ * @param {*} data The data to validate.
+ * @returns {boolean} true if the data is an object, false otherwise.
+ */
+export function validateObject(data) {
+    return typeof data === "object" && data !== null && !Array.isArray(data);
+}
+
+/**
+ * Validate whether the given browser subscription is in a valid format.
+ *
+ * The subscription must be an object with the following properties:
+ * - endpoint: a valid URL
+ * - keys: an object with the following properties:
+ *   - p256dh: a string of at least 1 character
+ *   - auth: a string of at least 1 character
+ * - expirationTime: a number, null, or undefined
+ *
+ * @param {Object} subscription The subscription to validate.
+ * @returns {boolean} true if the subscription is valid, false otherwise.
+ */
+export function validateBrowserSubscription(subscription) {
+    return subscription === null || (validateObject(subscription) && validateUrl(subscription.endpoint) && validateObject(subscription.keys) && validateString(subscription.keys.p256dh) && subscription.keys.p256dh.length > 0 && validateString(subscription.keys.auth) && subscription.keys.auth.length > 0 && (typeof subscription.expirationTime === "number" || subscription.expirationTime === null || subscription.expirationTime === undefined));
+}
+
+/**
+ * Validate whether the given push subscription is in a valid format.
+ *
+ * @param {Object} subscription The subscription to validate.
+ * @returns {boolean} true if the subscription is valid, false otherwise.
+ */
+export function validatePushSubscription(subscription) {
+    return subscription === null || validateObject(subscription);
+}
+    

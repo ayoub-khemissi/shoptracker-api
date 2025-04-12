@@ -1,7 +1,7 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { validateBoolean } from "../Modules/DataValidation.js";
+import { validateBoolean, validateBrowserSubscription, validatePushSubscription } from "../Modules/DataValidation.js";
 
 api.patch("/notifications/update/", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -20,38 +20,50 @@ api.patch("/notifications/update/", async function (req, res) {
         return;
     }
 
-    const { alertEmail, alertText, alertBrowserNotification, alertPushNotification } = req.body;
+    const { alertEmail, alertSms, alertBrowser, alertPush, alertBrowserSubscription, alertPushSubscription } = req.body;
 
     if (!validateBoolean(alertEmail)) {
         res.status(400).json({ data: null, msg: "Invalid alertEmail format." });
         return;
     }
 
-    if (!validateBoolean(alertText)) {
-        res.status(400).json({ data: null, msg: "Invalid alertText format." });
+    if (!validateBoolean(alertSms)) {
+        res.status(400).json({ data: null, msg: "Invalid alertSms format." });
         return;
     }
 
-    if (!validateBoolean(alertBrowserNotification)) {
-        res.status(400).json({ data: null, msg: "Invalid alertBrowserNotification format." });
+    if (!validateBoolean(alertBrowser)) {
+        res.status(400).json({ data: null, msg: "Invalid alertBrowser format." });
         return;
     }
 
-    if (!validateBoolean(alertPushNotification)) {
-        res.status(400).json({ data: null, msg: "Invalid alertPushNotification format." });
+    if (!validateBoolean(alertPush)) {
+        res.status(400).json({ data: null, msg: "Invalid alertPush format." });
+        return;
+    }
+
+    if (!validateBrowserSubscription(alertBrowserSubscription)) {
+        res.status(400).json({ data: null, msg: "Invalid alertBrowserSubscription format." });
+        return;
+    }
+
+    if (!validatePushSubscription(alertPushSubscription)) {
+        res.status(400).json({ data: null, msg: "Invalid alertPushSubscription format." });
         return;
     }
 
     const valuesA = [
         alertEmail,
-        alertText,
-        alertBrowserNotification,
-        alertPushNotification,
+        alertSms,
+        alertBrowser,
+        alertPush,
+        alertBrowserSubscription,
+        alertPushSubscription,
         Date.now(),
         jwt.id,
     ];
     const queryA =
-        "UPDATE user SET alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=?, updated_at=? WHERE id=?";
+        "UPDATE user SET alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
     await Database.execute(queryA, valuesA);
 
     res.status(200).json({ data: null, msg: "User notifications successfully updated." });

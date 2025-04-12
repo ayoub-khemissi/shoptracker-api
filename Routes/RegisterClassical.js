@@ -48,20 +48,25 @@ api.post("/register/classical", async function (req, res) {
         if (user.disabled) {
             user.disabled = false;
             user.alert_email = true;
-            user.alert_text = !!user.phone;
-            user.alert_browser_notification = true;
-            user.alert_push_notification = true;
+            user.alert_sms = !!user.phone;
+            user.alert_browser = !!user.alert_browser_subscription;
+            user.alert_push = !!user.alert_push_subscription;
+            user.alert_browser_subscription = null;
+            user.alert_push_subscription = null;
 
             const valuesB = [
                 user.disabled,
                 user.alert_email,
-                user.alert_text,
-                user.alert_browser_notification,
-                user.alert_push_notification,
+                user.alert_sms,
+                user.alert_browser,
+                user.alert_push,
+                user.alert_browser_subscription,
+                user.alert_push_subscription,
+                Date.now(),
                 user.id,
             ];
             const queryB =
-                "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
+                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         } else {
             res.status(409).json({ data: null, msg: "User already exists." });
@@ -72,9 +77,9 @@ api.post("/register/classical", async function (req, res) {
     const passwordSalt = generateSalt();
     const passwordHash = hashPassword(cleanPassword, passwordSalt);
 
-    const valuesC = [cleanEmail, passwordSalt, passwordHash, true, false, true, true, Date.now()];
+    const valuesC = [cleanEmail, passwordSalt, passwordHash, true, false, false, false, null, null, Date.now()];
     const queryC =
-        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_text=VALUES(alert_text), alert_browser_notification=VALUES(alert_browser_notification), alert_push_notification=VALUES(alert_push_notification), created_at=VALUES(created_at)";
+        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);
 
     if (resultC.affectedRows === 0) {

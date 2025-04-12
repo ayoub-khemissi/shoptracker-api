@@ -35,20 +35,25 @@ api.post("/register/google", async function (req, res) {
         if (user.disabled) {
             user.disabled = false;
             user.alert_email = true;
-            user.alert_text = !!user.phone;
-            user.alert_browser_notification = true;
-            user.alert_push_notification = true;
+            user.alert_sms = !!user.phone;
+            user.alert_browser = !!user.alert_browser_subscription;
+            user.alert_push = !!user.alert_push_subscription;
+            user.alert_browser_subscription = null;
+            user.alert_push_subscription = null;
 
             const valuesB = [
                 user.disabled,
                 user.alert_email,
-                user.alert_text,
-                user.alert_browser_notification,
-                user.alert_push_notification,
+                user.alert_sms,
+                user.alert_browser,
+                user.alert_push,
+                user.alert_browser_subscription,
+                user.alert_push_subscription,
+                Date.now(),
                 user.id,
             ];
             const queryB =
-                "UPDATE user SET disabled=?, alert_email=?, alert_text=?, alert_browser_notification=?, alert_push_notification=? WHERE id=?";
+                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         }
 
@@ -89,9 +94,9 @@ api.post("/register/google", async function (req, res) {
         return;
     }
 
-    const valuesB = [email, true, false, true, true, Date.now()];
+    const valuesB = [email, true, false, false, false, null, null, Date.now()];
     const queryB =
-        "INSERT INTO user (email, alert_email, alert_text, alert_browser_notification, alert_push_notification, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        "INSERT INTO user (email, alert_email, alert_sms, alert_browser, alert_push, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     if (resultB.affectedRows === 0) {
