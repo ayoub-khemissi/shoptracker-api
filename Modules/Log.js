@@ -1,16 +1,22 @@
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 import Database from "./Database.js";
+import { readFileSync } from "fs";
 
 const { SHOPTRACKER_LOG_LEVEL } = Config;
-const { logLevelDebug, logLevelInfo, logLevelWarn, logLevelError } = Constants;
+const { appId, logLevelDebug, logLevelInfo, logLevelWarn, logLevelError } = Constants;
+const { version } = JSON.parse(readFileSync("package.json"));
 
 class Log {
     /**
      * Logs a debug message
      * @param {string} text - The message to log
      */
-    debug(text) {
+    async debug(text) {
+        if (!this.appInstanceId) {
+            await this.setupAppInstanceId();
+        }
+
         if (SHOPTRACKER_LOG_LEVEL > logLevelDebug) {
             return;
         }
@@ -23,7 +29,11 @@ class Log {
      * Logs an informational message
      * @param {string} text - The message to log
      */
-    info(text) {
+    async info(text) {
+        if (!this.appInstanceId) {
+            await this.setupAppInstanceId();
+        }
+
         if (SHOPTRACKER_LOG_LEVEL > logLevelInfo) {
             return;
         }
@@ -36,7 +46,11 @@ class Log {
      * Logs a warning message
      * @param {string} text - The message to log
      */
-    warn(text) {
+    async warn(text) {
+        if (!this.appInstanceId) {
+            await this.setupAppInstanceId();
+        }
+
         if (SHOPTRACKER_LOG_LEVEL > logLevelWarn) {
             return;
         }
@@ -49,7 +63,11 @@ class Log {
      * Logs an error message
      * @param {string} text - The message to log
      */
-    error(text) {
+    async error(text) {
+        if (!this.appInstanceId) {
+            await this.setupAppInstanceId();
+        }
+
         if (SHOPTRACKER_LOG_LEVEL > logLevelError) {
             return;
         }
@@ -76,10 +94,19 @@ class Log {
 
     /**
      * Sets the ID of the app instance to associate with log entries.
-     * @param {number} appInstanceId - The ID of the app instance.
      */
-    setAppInstanceId(appInstanceId) {
-        this.appInstanceId = appInstanceId;
+    async setupAppInstanceId() {
+        const values = [appId, version, Date.now()];
+        const query = "INSERT INTO app_instance (app_id, version, created_at) VALUES (?, ?, ?)";
+        const [result] = await Database.execute(query, values);
+
+        if (result.affectedRows > 0) {
+            this.appInstanceId = result.insertId;
+        } else {
+            const error = new Error("Failed to setup app instance for logging.");
+            console.error("@Log:setupAppInstanceId - an error occurred: " + error);
+            throw error;
+        }
     }
 }
 

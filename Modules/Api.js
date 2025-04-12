@@ -2,9 +2,7 @@ import consoleStamp from "console-stamp";
 import express from "express";
 import { readFileSync } from "fs";
 import Config from "../Utils/Config.js";
-import Database from "./Database.js";
 import Log from "./Log.js";
-import Constants from "../Utils/Constants.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -18,7 +16,6 @@ const {
     SHOPTRACKER_FRONT_HTTPSECURE,
     SHOPTRACKER_FRONT_PORT,
 } = Config;
-const { appId } = Constants;
 const { version, description } = JSON.parse(readFileSync("package.json"));
 
 const api = express();
@@ -34,6 +31,19 @@ api.use(
         allowedHeaders: ["Content-Type"],
     }),
 );
+// eslint-disable-next-line
+api.use((err, req, res, next) => {
+    const originalUrl = req?.originalUrl || "";
+    const errorMessage = err?.message || "";
+    const msg = `Internal server error - ${originalUrl} - ${errorMessage}`;
+
+    Log.error(msg);
+
+    res.status(err.status || 500).json({
+        data: null,
+        msg: msg,
+    });
+});
 api.disable("x-powered-by");
 
 api.get("/", function (req, res) {
@@ -44,14 +54,6 @@ api.get("/", function (req, res) {
 });
 
 api.listen(SHOPTRACKER_API_PORT, SHOPTRACKER_API_HOSTNAME, async function () {
-    const values = [appId, version, Date.now()];
-    const query = "INSERT INTO app_instance (app_id, version, created_at) VALUES (?, ?, ?)";
-    const [result] = await Database.execute(query, values);
-
-    if (result.affectedRows > 0) {
-        Log.setAppInstanceId(result.insertId);
-    }
-
     Log.info(
         `API listening on http${SHOPTRACKER_API_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_API_HOSTNAME}:${SHOPTRACKER_API_PORT}/.`,
     );
