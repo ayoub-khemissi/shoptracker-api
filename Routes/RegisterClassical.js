@@ -20,8 +20,8 @@ api.post("/register/classical", async function (req, res) {
         return;
     }
 
-    if (!(await verifyRecaptchaToken(recaptchaToken))) {
-        res.status(400).json({ data: null, msg: "Invalid reCAPTCHA token" });
+    if (!(await verifyRecaptchaToken(recaptchaToken, req.ip))) {
+        res.status(401).json({ data: null, msg: "reCAPTCHA verification failed." });
         return;
     }
 

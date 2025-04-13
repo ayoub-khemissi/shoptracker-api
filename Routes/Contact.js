@@ -14,8 +14,8 @@ api.post('/contact', async (req, res) => {
         return res.status(400).json({ data: null, msg: "reCAPTCHA token is required." });
     }
 
-    if (!(await verifyRecaptchaToken(recaptchaToken))) {
-        return res.status(400).json({ data: null, msg: "Invalid reCAPTCHA token" });
+    if (!(await verifyRecaptchaToken(recaptchaToken, req.ip))) {
+        return res.status(401).json({ data: null, msg: "reCAPTCHA verification failed." });
     }
 
     const cleanEmail = cleanStringData(email);
