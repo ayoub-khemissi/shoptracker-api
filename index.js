@@ -19,6 +19,7 @@ import "./Routes/PasswordCodeGenerate.js";
 import "./Routes/PasswordCodeVerify.js";
 import "./Routes/PasswordCodeReset.js";
 import "./Routes/PasswordReset.js";
-import "./Routes/PhoneUpdate.js";
 import "./Routes/Subscription.js";
 import "./Routes/Contact.js";
+import "./Routes/PhoneCodeGenerate.js";
+import "./Routes/PhoneCodeVerify.js";
