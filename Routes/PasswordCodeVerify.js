@@ -3,7 +3,7 @@ import Database from "../Modules/Database.js";
 import { validateCode, validateEmail } from "../Modules/DataValidation.js";
 import Constants from "../Utils/Constants.js";
 
-const { resetPasswordCodeLength } = Constants;
+const { resetPasswordCodeLength, codeExpirationTime } = Constants;
 
 api.post("/password/code/verify", async function (req, res) {
     const { email, resetPasswordCode } = req.body;
@@ -19,7 +19,7 @@ api.post("/password/code/verify", async function (req, res) {
     }
 
     const valuesA = [email, false];
-    const queryA = "SELECT reset_password_code FROM user WHERE email=? AND disabled=?";
+    const queryA = "SELECT reset_password_code, updated_at FROM user WHERE email=? AND disabled=?";
     const [resultA] = await Database.execute(queryA, valuesA);
 
     if (resultA.length === 0) {
@@ -34,5 +34,10 @@ api.post("/password/code/verify", async function (req, res) {
         return;
     }
 
-    res.status(200).json({ data: null, msg: "Reset password code successfully verified." });
+    if (Date.now() - user.updated_at > codeExpirationTime) {
+        res.status(400).json({ data: null, msg: "Reset password code expired." });
+        return;
+    }
+
+    res.status(200).json({ data: null, msg: "Reset password code successfully validated." });
 });

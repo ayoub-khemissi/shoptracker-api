@@ -25,7 +25,7 @@ api.post("/password/code/generate", async function (req, res) {
         return;
     }
 
-    const resetPasswordCode = generateCode(resetPasswordCodeLength / 2);
+    const resetPasswordCode = generateCode(resetPasswordCodeLength);
 
     const valuesB = [resetPasswordCode, Date.now(), email];
     const queryB = "UPDATE user SET reset_password_code=?, updated_at=? WHERE email=?";
