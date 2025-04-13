@@ -34,9 +34,24 @@ export function hashPassword(password, salt) {
 /**
  * Generates a random code of the given size.
  *
- * @param {number} [bytesSize=16] The size of the code to generate, in bytes.
+ * @param {number} [size=16] The size of the code to generate.
  * @returns {string} The generated code.
  */
-export function generateCode(bytesSize = 16) {
-    return crypto.randomBytes(bytesSize).toString("hex");
+export function generateCode(size = 16) {
+    const finalSize = size < 1 ? 16 : size;
+    return crypto.randomBytes(finalSize / 2).toString("hex");
+}
+
+/**
+ * Generates a random number of the given size.
+ *
+ * @param {number} [size=6] The size of the number to generate.
+ * @returns {number} The generated number.
+ */
+export function generateDigits(size = 6) {
+    const finalSize = size < 1 ? 6 : size;
+
+    const min = 10 ** (finalSize - 1);
+    const max = 10 ** finalSize;
+    return crypto.getRandomValues(new Uint32Array(1))[0] % (max - min) + min;
 }
