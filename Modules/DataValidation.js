@@ -59,15 +59,25 @@ export function validateNumber(data) {
 /**
  * Validate whether the given code is in a valid format.
  *
- * The code must be a string of exactly 8 characters, consisting of lowercase letters and digits.
- *
  * @param {string} code The code to validate.
- * @param {number} [codeRequiredLength=16] The length of the code required.
+ * @param {number} [codeRequiredSize=16] The size of the code required.
  * @returns {boolean} true if the code is valid, false otherwise.
  */
-export function validateCode(code, codeRequiredLength = 16) {
-    const codeRegex = new RegExp(`^[0-9a-f]{${codeRequiredLength}}$`);
+export function validateCode(code, codeRequiredSize = 16) {
+    const codeRegex = new RegExp(`^[0-9a-f]{${codeRequiredSize}}$`);
     return code && codeRegex.test(code);
+}
+
+/**
+ * Validate whether the given digits is in a valid format.
+ *
+ * @param {string} digits The digits to validate.
+ * @param {number} [digitsRequiredSize=6] The size of the digits required.
+ * @returns {boolean} true if the digits is valid, false otherwise.
+ */
+export function validateDigits(digits, digitsRequiredSize = 6) {
+    const digitsRegex = new RegExp(`^\\d{${digitsRequiredSize}}$`);
+    return digits && digitsRegex.test(digits);
 }
 
 /**
