@@ -21,8 +21,12 @@ const Constants = {
     jwtExpirationTime: 30 * 24 * 60 * 60 * 1000,
 
     mailTemplatesPath: "Resources/MailTemplates",
+    textTemplatesPath: "Resources/TextTemplates",
 
     resetPasswordCodeLength: 16,
+    verifyPhoneCodeLength: 6,
+
+    codeExpirationTime: 15 * 60 * 1000,
 
     logLevelDebug: 1,
     logLevelInfo: 2,
