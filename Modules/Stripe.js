@@ -38,9 +38,7 @@ export async function createCustomer(customerData) {
  */
 export async function cancelSubscription(subscriptionId, cancelAtPeriodEnd = false) {
     try {
-        return await stripe.subscriptions.cancel(subscriptionId, {
-            cancel_at_period_end: cancelAtPeriodEnd,
-        });
+        return cancelAtPeriodEnd ? await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true }) : await stripe.subscriptions.cancel(subscriptionId);
     } catch (error) {
         Log.error(`@Stripe:cancelSubscription - Error canceling subscription: ${error}`);
         return null;
