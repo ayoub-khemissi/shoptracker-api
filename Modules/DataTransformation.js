@@ -19,7 +19,7 @@ export function cleanStringData(data) {
  * @returns {Object|null} The cleared user object, or null if the input is null.
  */
 export function clearSensitiveData(data) {
-    if (!data) {
+    if (typeof data !== "object" || data === null) {
         return null;
     }
 
