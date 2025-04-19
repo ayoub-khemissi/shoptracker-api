@@ -4,7 +4,7 @@ import Database from "../Modules/Database.js";
 import { cancelSubscription, retrieveSubscription } from "../Modules/Stripe.js";
 import Constants from "../Utils/Constants.js";
 
-const { subscriptionActive, subscriptionCanceled } = Constants;
+const { subscriptionActive } = Constants;
 
 api.delete("/subscription/cancel", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -46,16 +46,25 @@ api.delete("/subscription/cancel", async function (req, res) {
         return;
     }
 
-    const canceledSubscription = await cancelSubscription(stripeSubscriptionId);
+    if (subscription.cancel_at_period_end) {
+        res.status(400).json({ data: null, msg: "Stripe subscription cancelation is already in progress." });
+        return;
+    }
+
+    const valuesB = [jwt.id];
+    const queryB =
+        "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
+    const [resultB] = await Database.execute(queryB, valuesB);
+
+    const { first_subscription_date, last_subscription_date } = resultB[0];
+    const cancelAtPeriodEnd = first_subscription_date !== last_subscription_date || subscription.trial_end < Date.now();
+
+    const canceledSubscription = await cancelSubscription(stripeSubscriptionId, cancelAtPeriodEnd);
 
     if (!canceledSubscription) {
         res.status(400).json({ data: null, msg: "Stripe subscription cannot be canceled." });
         return;
     }
-
-    const valuesB = [subscriptionCanceled, stripeSubscriptionId];
-    const queryB = "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
-    await Database.execute(queryB, valuesB);
 
     res.status(200).json({ data: null, msg: "Subscription successfully canceled." });
 });

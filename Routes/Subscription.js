@@ -39,11 +39,12 @@ api.get("/subscription", async function (req, res) {
 
     const valuesD = [jwt.id];
     const queryD =
-        "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+        "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
     const [resultD] = await Database.execute(queryD, valuesD);
 
-    const { first_subscription_date } = resultD[0];
+    const { first_subscription_date, last_subscription_date } = resultD[0];
     subscription.first_subscription_date = first_subscription_date || null;
+    subscription.last_subscription_date = last_subscription_date || null;
 
     res.status(200).json({ data: subscription, msg: "Subscription successfully found." });
 });

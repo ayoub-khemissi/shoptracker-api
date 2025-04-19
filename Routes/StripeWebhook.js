@@ -44,7 +44,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 const [resultB] = await Database.execute(queryB, valuesB);
 
                 for (const sub of resultB) {
-                    if (!(await cancelSubscription(sub.stripe_subscription_id, false))) {
+                    if (!(await cancelSubscription(sub.stripe_subscription_id))) {
                         Log.error(
                             `/stripe-webhook:customer.subscription.created - Old subscription failed to cancel subscription=${sub.stripe_subscription_id} for user=${user.id}-${user.email}`,
                         );

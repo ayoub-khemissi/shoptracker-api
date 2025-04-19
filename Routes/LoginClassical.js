@@ -64,11 +64,12 @@ api.post("/login/classical", async function (req, res) {
 
     const valuesC = [user.id];
     const queryC =
-        "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+        "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
     const [resultC] = await Database.execute(queryC, valuesC);
 
-    const { first_subscription_date } = resultC[0];
+    const { first_subscription_date, last_subscription_date } = resultC[0];
     user.subscription.first_subscription_date = first_subscription_date || null;
+    user.subscription.last_subscription_date = last_subscription_date || null;
 
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData(cloneObject(user));

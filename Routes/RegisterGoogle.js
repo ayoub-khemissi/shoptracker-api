@@ -77,11 +77,12 @@ api.post("/register/google", async function (req, res) {
 
         const valuesD = [user.id];
         const queryD =
-            "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+            "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
         const [resultD] = await Database.execute(queryD, valuesD);
 
-        const { first_subscription_date } = resultD[0];
+        const { first_subscription_date, last_subscription_date } = resultD[0];
         user.subscription.first_subscription_date = first_subscription_date || null;
+        user.subscription.last_subscription_date = last_subscription_date || null;
 
         const jwt = signAuthJwt({ email: user.email, id: user.id });
         const data = clearSensitiveData(cloneObject(user));
@@ -136,11 +137,12 @@ api.post("/register/google", async function (req, res) {
 
     const valuesE = [user.id];
     const queryE =
-        "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+        "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
     const [resultE] = await Database.execute(queryE, valuesE);
 
-    const { first_subscription_date } = resultE[0];
+    const { first_subscription_date, last_subscription_date } = resultE[0];
     user.subscription.first_subscription_date = first_subscription_date || null;
+    user.subscription.last_subscription_date = last_subscription_date || null;
 
     const jwt = signAuthJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData(cloneObject(user));
