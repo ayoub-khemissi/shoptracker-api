@@ -46,6 +46,20 @@ export async function cancelSubscription(subscriptionId, cancelAtPeriodEnd = fal
 }
 
 /**
+ * Reactivates a subscription in Stripe.
+ * @param {string} subscriptionId - The ID of the subscription to reactivate.
+ * @returns {Promise<Object> | null} The reactivated subscription or null if an error occurs.
+ */
+export async function reactivateSubscription(subscriptionId) {
+    try {
+        return await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: false });
+    } catch (error) {
+        Log.error(`@Stripe:reactivateSubscription - Error reactivating subscription: ${error}`);
+        return null;
+    }
+}
+
+/**
  * Creates a checkout session for a subscription.
  * @param {string} customerId - The ID of the customer.
  * @param {string} priceId - The ID of the price.
@@ -165,6 +179,7 @@ export async function retrieveSubscription(subscriptionId) {
         const currency = subscription.items.data[0].price.currency;
         const trialEnd = subscription.trial_end * 1000;
         const cancelAtPeriodEnd = subscription.cancel_at_period_end;
+        const currentPeriodEnd = subscription.current_period_end * 1000;
 
         return {
             start_date: startDate,
@@ -176,6 +191,7 @@ export async function retrieveSubscription(subscriptionId) {
             trial_end: trialEnd,
             status: subscription.status,
             cancel_at_period_end: cancelAtPeriodEnd,
+            current_period_end: currentPeriodEnd,
         };
     } catch (error) {
         Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`);

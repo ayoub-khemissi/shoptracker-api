@@ -23,3 +23,4 @@ import "./Routes/Subscription.js";
 import "./Routes/Contact.js";
 import "./Routes/PhoneCodeGenerate.js";
 import "./Routes/PhoneCodeVerify.js";
+import "./Routes/SubscriptionReactivate.js";
