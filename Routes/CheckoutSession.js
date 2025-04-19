@@ -54,11 +54,12 @@ api.post("/checkout/session", async function (req, res) {
     const [resultC] = await Database.execute(queryC, valuesC);
 
     const { first_subscription_date } = resultC[0];
+    const isFirstSubscription = first_subscription_date === null;
 
     const session = await createCheckoutSession(
         user.stripe_customer_id,
         stripePriceId,
-        first_subscription_date === null,
+        isFirstSubscription,
     );
 
     if (!session) {
