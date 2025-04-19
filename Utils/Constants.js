@@ -28,10 +28,25 @@ const Constants = {
 
     codeExpirationTime: 15 * 60 * 1000,
 
+    subscriptionTrialPeriodDays: 7,
+
     logLevelDebug: 1,
     logLevelInfo: 2,
     logLevelWarn: 3,
     logLevelError: 4,
+
+    defaultSubscriptionDetails: {
+        stripe_price_id: null,
+        stripe_subscription_id: null,
+        start_date: null,
+        next_payment_date: null,
+        payment_method: null,
+        invoice_history: [],
+        billing_period: null,
+        currency: null,
+        trial_end: null,
+        first_subscription_date: null,
+    },
 
     appId: 1,
 };
