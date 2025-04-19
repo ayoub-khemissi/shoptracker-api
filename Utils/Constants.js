@@ -45,7 +45,10 @@ const Constants = {
         billing_period: null,
         currency: null,
         trial_end: null,
+        status: null,
+        cancel_at_period_end: null,
         first_subscription_date: null,
+        last_subscription_date: null,
     },
 
     appId: 1,
