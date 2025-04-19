@@ -52,14 +52,18 @@ api.post("/phone/code/generate", async function (req, res) {
     const timeLeft = convertMillisecondsToText(codeExpirationTime - (Date.now() - updated_at));
 
     if (Number(phone_candidate) === Number(phone) && Date.now() - updated_at < codeExpirationTime) {
-        res.status(429).json({ data: null, msg: `Verify phone code already sent, please check your WhatsApp or wait ${timeLeft}.` });
+        res.status(429).json({
+            data: null,
+            msg: `Verify phone code already sent, please check your WhatsApp or wait ${timeLeft}.`,
+        });
         return;
     }
 
     const verifyPhoneCode = generateDigits(verifyPhoneCodeLength);
 
     const valuesC = [verifyPhoneCode, phone, Date.now(), jwt.id];
-    const queryC = "UPDATE user SET verify_phone_code=?, phone_candidate=?, updated_at=? WHERE id=?";
+    const queryC =
+        "UPDATE user SET verify_phone_code=?, phone_candidate=?, updated_at=? WHERE id=?";
     await Database.execute(queryC, valuesC);
 
     const textBody = formatBodyForVerifyPhoneCode(verifyPhoneCode);

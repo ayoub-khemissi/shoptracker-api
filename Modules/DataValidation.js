@@ -127,7 +127,19 @@ export function validateObject(data) {
  * @returns {boolean} true if the subscription is valid, false otherwise.
  */
 export function validateBrowserSubscription(subscription) {
-    return subscription === null || (validateObject(subscription) && validateUrl(subscription.endpoint) && validateObject(subscription.keys) && validateString(subscription.keys.p256dh) && subscription.keys.p256dh.length > 0 && validateString(subscription.keys.auth) && subscription.keys.auth.length > 0 && (typeof subscription.expirationTime === "number" || subscription.expirationTime === null || subscription.expirationTime === undefined));
+    return (
+        subscription === null ||
+        (validateObject(subscription) &&
+            validateUrl(subscription.endpoint) &&
+            validateObject(subscription.keys) &&
+            validateString(subscription.keys.p256dh) &&
+            subscription.keys.p256dh.length > 0 &&
+            validateString(subscription.keys.auth) &&
+            subscription.keys.auth.length > 0 &&
+            (typeof subscription.expirationTime === "number" ||
+                subscription.expirationTime === null ||
+                subscription.expirationTime === undefined))
+    );
 }
 
 /**
@@ -139,4 +151,3 @@ export function validateBrowserSubscription(subscription) {
 export function validatePushSubscription(subscription) {
     return subscription === null || validateObject(subscription);
 }
-    

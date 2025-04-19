@@ -177,9 +177,7 @@ export async function retrieveSubscription(subscriptionId) {
             trial_end: trialEnd,
         };
     } catch (error) {
-        Log.error(
-            `@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`,
-        );
+        Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`);
         return null;
     }
 }

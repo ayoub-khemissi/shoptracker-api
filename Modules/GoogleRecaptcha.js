@@ -20,7 +20,7 @@ export async function verifyRecaptchaToken(token, remoteIp) {
 
         const result = await verifyAsync({
             response: token,
-            remoteip: remoteIp
+            remoteip: remoteIp,
         });
 
         return result?.success && result?.score > 0.5;

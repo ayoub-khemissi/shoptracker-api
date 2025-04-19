@@ -55,7 +55,11 @@ api.post("/checkout/session", async function (req, res) {
 
     const { first_subscription_date } = resultC[0];
 
-    const session = await createCheckoutSession(user.stripe_customer_id, stripePriceId, first_subscription_date === null);
+    const session = await createCheckoutSession(
+        user.stripe_customer_id,
+        stripePriceId,
+        first_subscription_date === null,
+    );
 
     if (!session) {
         res.status(400).json({ data: null, msg: "Failed to create a checkout session." });

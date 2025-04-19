@@ -4,14 +4,19 @@ import { convertMillisecondsToText, formatPrice } from "../Utils/TextFormatter.j
 import Config from "../Utils/Config.js";
 
 const { mailTemplatesPath } = Constants;
-const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_HOSTNAME, SHOPTRACKER_FRONT_PORT, SHOPTRACKER_MAILER_DEFAULT_MAIL } = Config;
+const {
+    SHOPTRACKER_FRONT_HTTPSECURE,
+    SHOPTRACKER_FRONT_HOSTNAME,
+    SHOPTRACKER_FRONT_PORT,
+    SHOPTRACKER_MAILER_DEFAULT_MAIL,
+} = Config;
 
 const resetPasswordCodePlaceholder = "{{RESET_PASSWORD_CODE}}";
 
 const contactFormPlaceholders = {
     email: "{{EMAIL}}",
     subject: "{{SUBJECT}}",
-    content: "{{CONTENT}}"
+    content: "{{CONTENT}}",
 };
 
 const subscriptionPlaceholders = {
@@ -27,14 +32,14 @@ const subscriptionPlaceholders = {
     maxWishlistProducts: "{{MAX_WISHLIST_PRODUCTS}}",
     maxSearchesPerDay: "{{MAX_SEARCHES_PER_DAY}}",
     frontUrl: "{{FRONT_URL}}",
-    supportEmail: "{{SUPPORT_EMAIL}}"
+    supportEmail: "{{SUPPORT_EMAIL}}",
 };
 
 const dateFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
 };
 
 /**
@@ -60,14 +65,20 @@ export const formatBodyForSubscriptionConfirmation = (plan, subscriptionDetails)
         .readFileSync(`${mailTemplatesPath}/mail_template_subscription_confirmation.html`, "utf-8")
         .toString();
 
-    const startDate = new Date(subscriptionDetails.start_date).toLocaleDateString('en-GB', dateFormatOptions);
-    const nextPaymentDate = new Date(subscriptionDetails.next_payment_date).toLocaleDateString('en-GB', dateFormatOptions);
+    const startDate = new Date(subscriptionDetails.start_date).toLocaleDateString(
+        "en-GB",
+        dateFormatOptions,
+    );
+    const nextPaymentDate = new Date(subscriptionDetails.next_payment_date).toLocaleDateString(
+        "en-GB",
+        dateFormatOptions,
+    );
 
     const checkInterval = convertMillisecondsToText(plan.track_check_interval);
 
     const frontUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
 
-    const formattedPrice = formatPrice((subscriptionDetails.invoice_history[0].amount));
+    const formattedPrice = formatPrice(subscriptionDetails.invoice_history[0].amount);
 
     return template
         .replace(subscriptionPlaceholders.planName, plan.name)

@@ -1,7 +1,11 @@
 import api from "../Modules/Api.js";
 import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
-import { validateBoolean, validateBrowserSubscription, validatePushSubscription } from "../Modules/DataValidation.js";
+import {
+    validateBoolean,
+    validateBrowserSubscription,
+    validatePushSubscription,
+} from "../Modules/DataValidation.js";
 
 api.patch("/notifications/update/", async function (req, res) {
     const jwt = verifyAuthJwt(extractJwt(req.cookies));
@@ -20,7 +24,14 @@ api.patch("/notifications/update/", async function (req, res) {
         return;
     }
 
-    const { alertEmail, alertSms, alertBrowser, alertPush, alertBrowserSubscription, alertPushSubscription } = req.body;
+    const {
+        alertEmail,
+        alertSms,
+        alertBrowser,
+        alertPush,
+        alertBrowserSubscription,
+        alertPushSubscription,
+    } = req.body;
 
     if (!validateBoolean(alertEmail)) {
         res.status(400).json({ data: null, msg: "Invalid alertEmail format." });

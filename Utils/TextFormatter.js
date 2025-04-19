@@ -36,16 +36,16 @@ export function convertMillisecondsToText(ms) {
 }
 
 /**
-* @param {number|string} price
-* @returns {string}
-* @description
-* Takes a number or a string, and returns a human-readable string.
-* The output is the number or string formatted as a price
-* with a comma as the decimal separator and spaces as the thousand separator.
-* @example
-* formatPrice(9.99) // returns "9,99"
-* formatPrice("9.99") // returns "9,99"
-*/
+ * @param {number|string} price
+ * @returns {string}
+ * @description
+ * Takes a number or a string, and returns a human-readable string.
+ * The output is the number or string formatted as a price
+ * with a comma as the decimal separator and spaces as the thousand separator.
+ * @example
+ * formatPrice(9.99) // returns "9,99"
+ * formatPrice("9.99") // returns "9,99"
+ */
 export function formatPrice(price) {
     if (typeof price !== "number" && typeof price !== "string") {
         return price;

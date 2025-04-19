@@ -53,5 +53,5 @@ export function generateDigits(size = 6) {
 
     const min = 10 ** (finalSize - 1);
     const max = 10 ** finalSize;
-    return crypto.getRandomValues(new Uint32Array(1))[0] % (max - min) + min;
+    return (crypto.getRandomValues(new Uint32Array(1))[0] % (max - min)) + min;
 }

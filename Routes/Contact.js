@@ -1,13 +1,13 @@
 import api from "../Modules/Api.js";
-import { verifyRecaptchaToken } from '../Modules/GoogleRecaptcha.js';
-import { sendEmail } from '../Modules/Mailer.js';
-import { cleanStringData } from '../Modules/DataTransformation.js';
-import Config from '../Utils/Config.js';
-import { formatBodyForContactForm } from '../Modules/ServicesMailFormatter.js';
+import { verifyRecaptchaToken } from "../Modules/GoogleRecaptcha.js";
+import { sendEmail } from "../Modules/Mailer.js";
+import { cleanStringData } from "../Modules/DataTransformation.js";
+import Config from "../Utils/Config.js";
+import { formatBodyForContactForm } from "../Modules/ServicesMailFormatter.js";
 
 const { SHOPTRACKER_MAILER_DEFAULT_MAIL } = Config;
 
-api.post('/contact', async (req, res) => {
+api.post("/contact", async (req, res) => {
     const { email, subject, content, recaptchaToken } = req.body;
 
     if (!recaptchaToken) {
@@ -32,7 +32,7 @@ api.post('/contact', async (req, res) => {
         SHOPTRACKER_MAILER_DEFAULT_MAIL,
         cleanSubject,
         body,
-        'Contact'
+        "Contact",
     );
 
     if (!emailSent) {
@@ -41,6 +41,6 @@ api.post('/contact', async (req, res) => {
 
     return res.status(200).json({
         data: { email: cleanEmail, subject: cleanSubject },
-        msg: "Contact message sent successfully."
+        msg: "Contact message sent successfully.",
     });
 });

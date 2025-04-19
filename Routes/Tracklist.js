@@ -36,7 +36,8 @@ api.get("/tracklist", async function (req, res) {
         track.track_checks_ok = [...resultB];
 
         const valuesC = [track.id];
-        const queryC = "SELECT tcko.id, tcko.created_at, tckor.title, tckor.reason FROM track_check_ko tcko JOIN track_check_ko_reason tckor ON tcko.reason_id = tckor.id WHERE tcko.track_id = ? ORDER BY tcko.created_at ASC LIMIT 5";
+        const queryC =
+            "SELECT tcko.id, tcko.created_at, tckor.title, tckor.reason FROM track_check_ko tcko JOIN track_check_ko_reason tckor ON tcko.reason_id = tckor.id WHERE tcko.track_id = ? ORDER BY tcko.created_at ASC LIMIT 5";
         const [resultC] = await Database.execute(queryC, valuesC);
         track.track_checks_ko = [...resultC];
     }

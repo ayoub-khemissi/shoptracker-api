@@ -10,7 +10,8 @@ import { retrieveSubscription } from "../Modules/Stripe.js";
 import { verifyRecaptchaToken } from "../Modules/GoogleRecaptcha.js";
 import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
 
-const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
+const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } =
+    Config;
 const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Constants;
 
 api.post("/register/classical", async function (req, res) {
@@ -78,7 +79,18 @@ api.post("/register/classical", async function (req, res) {
     const passwordSalt = generateSalt();
     const passwordHash = hashPassword(cleanPassword, passwordSalt);
 
-    const valuesC = [cleanEmail, passwordSalt, passwordHash, true, false, false, false, null, null, Date.now()];
+    const valuesC = [
+        cleanEmail,
+        passwordSalt,
+        passwordHash,
+        true,
+        false,
+        false,
+        false,
+        null,
+        null,
+        Date.now(),
+    ];
     const queryC =
         "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);

@@ -9,7 +9,8 @@ import Constants from "../Utils/Constants.js";
 import { retrieveSubscription } from "../Modules/Stripe.js";
 import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
 
-const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
+const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } =
+    Config;
 const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Constants;
 
 api.post("/login/classical", async function (req, res) {

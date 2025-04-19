@@ -44,7 +44,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 const [resultB] = await Database.execute(queryB, valuesB);
 
                 for (const sub of resultB) {
-                    if (!await cancelSubscription(sub.stripe_subscription_id, false)) {
+                    if (!(await cancelSubscription(sub.stripe_subscription_id, false))) {
                         Log.error(
                             `/stripe-webhook:customer.subscription.created - Old subscription failed to cancel subscription=${sub.stripe_subscription_id} for user=${user.id}-${user.email}`,
                         );
@@ -54,7 +54,8 @@ api.post("/stripe/webhook", async function (req, res) {
                 }
 
                 const valuesD = [priceId];
-                const queryD = "SELECT id, name, price, track_enabled_max_products, track_disabled_max_products, track_check_interval, track_user_max_searches_per_day FROM plan WHERE stripe_price_id=?";
+                const queryD =
+                    "SELECT id, name, price, track_enabled_max_products, track_disabled_max_products, track_check_interval, track_user_max_searches_per_day FROM plan WHERE stripe_price_id=?";
                 const [resultD] = await Database.execute(queryD, valuesD);
 
                 if (resultD.length === 0) {
@@ -98,7 +99,7 @@ api.post("/stripe/webhook", async function (req, res) {
                     user.email,
                     "Welcome to Your New ShopTracker Plan! 🎉",
                     emailBody,
-                    "Subscription"
+                    "Subscription",
                 );
             }
             break;
@@ -120,8 +121,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 }
 
                 const valuesB = [subscriptionCanceled, subscription.id];
-                const queryB =
-                    "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
+                const queryB = "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
                 await Database.execute(queryB, valuesB);
             }
             break;

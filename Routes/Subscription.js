@@ -33,9 +33,7 @@ api.get("/subscription", async function (req, res) {
     if (resultA.length > 0) {
         subscription = resultA[0];
 
-        const subscriptionDetails = await retrieveSubscription(
-            subscription.stripe_subscription_id,
-        );
+        const subscriptionDetails = await retrieveSubscription(subscription.stripe_subscription_id);
         subscription = mergeObjects(subscription, subscriptionDetails);
     }
 
