@@ -166,6 +166,7 @@ export async function retrieveSubscription(subscriptionId) {
         const billingPeriod = subscription.items.data[0].price.recurring.interval;
         const currency = subscription.items.data[0].price.currency;
         const trialEnd = subscription.trial_end * 1000;
+        const cancelAtPeriodEnd = subscription.cancel_at_period_end;
 
         return {
             start_date: startDate,
@@ -176,6 +177,7 @@ export async function retrieveSubscription(subscriptionId) {
             currency: currency,
             trial_end: trialEnd,
             status: subscription.status,
+            cancel_at_period_end: cancelAtPeriodEnd,
         };
     } catch (error) {
         Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`);
