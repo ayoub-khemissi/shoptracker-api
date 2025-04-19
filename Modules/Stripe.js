@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import Config from "../Utils/Config.js";
+import Constants from "../Utils/Constants.js";
 import Log from "./Log.js";
 
 const {
@@ -9,9 +10,15 @@ const {
     SHOPTRACKER_FRONT_HOSTNAME,
     SHOPTRACKER_FRONT_HTTPSECURE,
 } = Config;
+const { subscriptionTrialPeriodDays } = Constants;
 
 const stripe = new Stripe(STRIPE_API_KEY);
 
+/**
+ * Creates a new customer in Stripe.
+ * @param {Object} customerData - The data for the new customer.
+ * @returns {Promise<Object> | null} The created customer or null if an error occurs.
+ */
 export async function createCustomer(customerData) {
     try {
         return await stripe.customers.create({
@@ -23,28 +30,16 @@ export async function createCustomer(customerData) {
     }
 }
 
-export async function updateCustomer(customerId, updateData) {
-    try {
-        return await stripe.customers.update(customerId, updateData);
-    } catch (error) {
-        Log.error(`@Stripe:updateCustomer - Error updating customer: ${error}`);
-        return null;
-    }
-}
-
-export async function retrieveCustomer(customerId) {
-    try {
-        return await stripe.customers.retrieve(customerId);
-    } catch (error) {
-        Log.error(`@Stripe:retrieveCustomer - Error retrieving customer: ${error}`);
-        return null;
-    }
-}
-
-export async function cancelSubscription(subscriptionId) {
+/**
+ * Cancels a subscription in Stripe.
+ * @param {string} subscriptionId - The ID of the subscription to cancel.
+ * @param {boolean} cancelAtPeriodEnd - Whether to cancel the subscription at the end of the current period.
+ * @returns {Promise<Object> | null} The canceled subscription or null if an error occurs.
+ */
+export async function cancelSubscription(subscriptionId, cancelAtPeriodEnd = false) {
     try {
         return await stripe.subscriptions.cancel(subscriptionId, {
-            prorate: true,
+            cancel_at_period_end: cancelAtPeriodEnd,
         });
     } catch (error) {
         Log.error(`@Stripe:cancelSubscription - Error canceling subscription: ${error}`);
@@ -52,36 +47,18 @@ export async function cancelSubscription(subscriptionId) {
     }
 }
 
-export async function updateSubscription(subscriptionId, newPriceId) {
-    try {
-        return await stripe.subscriptions.update(subscriptionId, {
-            items: [
-                {
-                    id: subscriptionId,
-                    price: newPriceId,
-                },
-            ],
-        });
-    } catch (error) {
-        Log.error(`@Stripe:updateSubscription - Error updating subscription: ${error}`);
-        return null;
-    }
-}
-
-export async function retrieveSubscription(subscriptionId) {
-    try {
-        return await stripe.subscriptions.retrieve(subscriptionId);
-    } catch (error) {
-        Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription: ${error}`);
-        return null;
-    }
-}
-
-export async function createCheckoutSession(customerId, priceId) {
+/**
+ * Creates a checkout session for a subscription.
+ * @param {string} customerId - The ID of the customer.
+ * @param {string} priceId - The ID of the price.
+ * @param {boolean} isFirstSubscription - Whether this is the user's first subscription.
+ * @returns {Promise<Object> | null} The created checkout session or null if an error occurs.
+ */
+export async function createCheckoutSession(customerId, priceId, isFirstSubscription = false) {
     const frontBaseUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
 
     try {
-        return await stripe.checkout.sessions.create({
+        const sessionParams = {
             payment_method_types: ["card", "paypal"],
             line_items: [
                 {
@@ -93,13 +70,24 @@ export async function createCheckoutSession(customerId, priceId) {
             success_url: `${frontBaseUrl}/settings?tab=subscription`,
             cancel_url: `${frontBaseUrl}/pricing`,
             customer: customerId,
-        });
+        };
+        if (isFirstSubscription) {
+            sessionParams.subscription_data = {
+                trial_period_days: subscriptionTrialPeriodDays,
+            };
+        }
+        return await stripe.checkout.sessions.create(sessionParams);
     } catch (error) {
         Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
         return null;
     }
 }
 
+/**
+ * Retrieves the details of a price from Stripe.
+ * @param {string} priceId - The ID of the price to retrieve.
+ * @returns {Promise<Object>} The details of the price.
+ */
 export async function retrievePrice(priceId) {
     try {
         return await stripe.prices.retrieve(priceId);
@@ -109,6 +97,12 @@ export async function retrievePrice(priceId) {
     }
 }
 
+/**
+ * Constructs a webhook event from the provided body and signature.
+ * @param {string} body - The body of the webhook request.
+ * @param {string} stripeSignature - The signature of the webhook request.
+ * @returns {Event | null} The constructed event or null if an error occurs.
+ */
 export function constructEvent(body, stripeSignature) {
     try {
         return stripe.webhooks.constructEvent(body, stripeSignature, STRIPE_WEBHOOK_KEY);
@@ -118,7 +112,12 @@ export function constructEvent(body, stripeSignature) {
     }
 }
 
-export async function getSubscriptionDetails(subscriptionId) {
+/**
+ * Retrieves the details of a subscription from Stripe.
+ * @param {string} subscriptionId - The ID of the subscription to retrieve.
+ * @returns {Promise<Object>} The details of the subscription.
+ */
+export async function retrieveSubscription(subscriptionId) {
     try {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
@@ -164,18 +163,22 @@ export async function getSubscriptionDetails(subscriptionId) {
 
         const startDate = subscription.start_date * 1000;
         const nextPaymentDate = subscription.current_period_end * 1000;
+        const billingPeriod = subscription.items.data[0].price.recurring.interval;
+        const currency = subscription.items.data[0].price.currency;
+        const trialEnd = subscription.trial_end * 1000;
 
         return {
             start_date: startDate,
             next_payment_date: nextPaymentDate,
             payment_method: paymentMethodText,
             invoice_history: invoiceHistory,
-            billing_period: subscription.items.data[0].price.recurring.interval,
-            currency: subscription.items.data[0].price.currency
+            billing_period: billingPeriod,
+            currency: currency,
+            trial_end: trialEnd,
         };
     } catch (error) {
         Log.error(
-            `@Stripe:getSubscriptionDetails - Error retrieving subscription details: ${error}`,
+            `@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`,
         );
         return null;
     }
