@@ -6,11 +6,12 @@ import { validateEmail, validatePassword } from "../Modules/DataValidation.js";
 import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformation.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
-import { getSubscriptionDetails } from "../Modules/Stripe.js";
+import { retrieveSubscription } from "../Modules/Stripe.js";
 import { verifyRecaptchaToken } from "../Modules/GoogleRecaptcha.js";
+import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
-const { jwtExpirationTime, subscriptionActive } = Constants;
+const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Constants;
 
 api.post("/register/classical", async function (req, res) {
     const { email, password, recaptchaToken } = req.body;
@@ -106,23 +107,16 @@ api.post("/register/classical", async function (req, res) {
     if (resultE.length > 0) {
         user.subscription = resultE[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(
+        const subscriptionDetails = await retrieveSubscription(
             user.subscription.stripe_subscription_id,
         );
-        user.subscription = { ...user.subscription, ...subscriptionDetails };
+        user.subscription = mergeObjects(user.subscription, subscriptionDetails);
     } else {
-        user.subscription = {
-            stripe_price_id: null,
-            stripe_subscription_id: null,
-            start_date: null,
-            next_payment_date: null,
-            payment_method: null,
-            invoice_history: [],
-        };
+        user.subscription = cloneObject(defaultSubscriptionDetails);
     }
 
     const jwt = signAuthJwt({ email: user.email, id: user.id });
-    const data = clearSensitiveData({ ...user });
+    const data = clearSensitiveData(cloneObject(user));
 
     res.cookie("jwt", jwt, {
         httpOnly: true,

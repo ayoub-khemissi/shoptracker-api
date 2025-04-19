@@ -1,7 +1,7 @@
 import api from "../Modules/Api.js";
 import Database from "../Modules/Database.js";
 import Log from "../Modules/Log.js";
-import { cancelSubscription, constructEvent, getSubscriptionDetails } from "../Modules/Stripe.js";
+import { cancelSubscription, constructEvent, retrieveSubscription } from "../Modules/Stripe.js";
 import { sendEmail } from "../Modules/Mailer.js";
 import { formatBodyForSubscriptionConfirmation } from "../Modules/ServicesMailFormatter.js";
 import Constants from "../Utils/Constants.js";
@@ -44,12 +44,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 const [resultB] = await Database.execute(queryB, valuesB);
 
                 for (const sub of resultB) {
-                    if (await cancelSubscription(sub.stripe_subscription_id)) {
-                        const valuesC = [subscriptionCanceled, sub.stripe_subscription_id];
-                        const queryC =
-                            "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
-                        await Database.execute(queryC, valuesC);
-                    } else {
+                    if (!await cancelSubscription(sub.stripe_subscription_id, false)) {
                         Log.error(
                             `/stripe-webhook:customer.subscription.created - Old subscription failed to cancel subscription=${sub.stripe_subscription_id} for user=${user.id}-${user.email}`,
                         );
@@ -86,7 +81,7 @@ api.post("/stripe/webhook", async function (req, res) {
                 }
 
                 // Get subscription details for email
-                const subscriptionDetails = await getSubscriptionDetails(subscription.id);
+                const subscriptionDetails = await retrieveSubscription(subscription.id);
 
                 if (!subscriptionDetails) {
                     Log.error(
@@ -109,6 +104,26 @@ api.post("/stripe/webhook", async function (req, res) {
             break;
 
         case "customer.subscription.deleted":
+            {
+                const subscription = event.data.object;
+                const valuesA = [subscription.id, subscriptionActive];
+                const queryA =
+                    "SELECT stripe_subscription_id FROM subscription WHERE stripe_subscription_id=? AND status_id=?";
+                const [resultA] = await Database.execute(queryA, valuesA);
+
+                if (resultA.length === 0) {
+                    Log.error(
+                        `/stripe-webhook:customer.subscription.deleted - No subscription found for stripe_subscription_id=${subscription.id}`,
+                    );
+                    res.sendStatus(400);
+                    return;
+                }
+
+                const valuesB = [subscriptionCanceled, subscription.id];
+                const queryB =
+                    "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
+                await Database.execute(queryB, valuesB);
+            }
             break;
 
         case "customer.subscription.updated":

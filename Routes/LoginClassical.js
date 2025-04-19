@@ -6,10 +6,11 @@ import { validateEmail, validatePassword } from "../Modules/DataValidation.js";
 import { clearSensitiveData } from "../Modules/DataTransformation.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
-import { getSubscriptionDetails } from "../Modules/Stripe.js";
+import { retrieveSubscription } from "../Modules/Stripe.js";
+import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
-const { jwtExpirationTime, subscriptionActive } = Constants;
+const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Constants;
 
 api.post("/login/classical", async function (req, res) {
     const { email, password } = req.body;
@@ -52,23 +53,24 @@ api.post("/login/classical", async function (req, res) {
     if (resultB.length > 0) {
         user.subscription = resultB[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(
+        const subscriptionDetails = await retrieveSubscription(
             user.subscription.stripe_subscription_id,
         );
-        user.subscription = { ...user.subscription, ...subscriptionDetails };
+        user.subscription = mergeObjects(user.subscription, subscriptionDetails);
     } else {
-        user.subscription = {
-            stripe_price_id: null,
-            stripe_subscription_id: null,
-            start_date: null,
-            next_payment_date: null,
-            payment_method: null,
-            invoice_history: [],
-        };
+        user.subscription = cloneObject(defaultSubscriptionDetails);
     }
 
+    const valuesC = [user.id];
+    const queryC =
+        "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+    const [resultC] = await Database.execute(queryC, valuesC);
+
+    const { first_subscription_date } = resultC[0];
+    user.subscription.first_subscription_date = first_subscription_date || null;
+
     const jwt = signAuthJwt({ email: user.email, id: user.id });
-    const data = clearSensitiveData({ ...user });
+    const data = clearSensitiveData(cloneObject(user));
 
     res.cookie("jwt", jwt, {
         httpOnly: true,

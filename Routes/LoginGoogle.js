@@ -6,10 +6,11 @@ import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformati
 import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
-import { getSubscriptionDetails } from "../Modules/Stripe.js";
+import { retrieveSubscription } from "../Modules/Stripe.js";
+import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } = Config;
-const { jwtExpirationTime, subscriptionActive } = Constants;
+const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Constants;
 
 api.post("/login/google", async function (req, res) {
     const email = cleanStringData(req.body.email);
@@ -69,22 +70,23 @@ api.post("/login/google", async function (req, res) {
     if (resultC.length > 0) {
         user.subscription = resultC[0];
 
-        const subscriptionDetails = await getSubscriptionDetails(
+        const subscriptionDetails = await retrieveSubscription(
             user.subscription.stripe_subscription_id,
         );
-        user.subscription = { ...user.subscription, ...subscriptionDetails };
+        user.subscription = mergeObjects(user.subscription, subscriptionDetails);
     } else {
-        user.subscription = {
-            stripe_price_id: null,
-            stripe_subscription_id: null,
-            start_date: null,
-            next_payment_date: null,
-            payment_method: null,
-            invoice_history: [],
-        };
+        user.subscription = cloneObject(defaultSubscriptionDetails);
     }
 
-    const data = clearSensitiveData({ ...user });
+    const valuesD = [user.id];
+    const queryD =
+        "SELECT MIN(created_at) AS first_subscription_date FROM subscription WHERE user_id=?";
+    const [resultD] = await Database.execute(queryD, valuesD);
+
+    const { first_subscription_date } = resultD[0];
+    user.subscription.first_subscription_date = first_subscription_date || null;
+
+    const data = clearSensitiveData(cloneObject(user));
     const jwt = signAuthJwt({ email: user.email, id: user.id });
 
     res.cookie("jwt", jwt, {
