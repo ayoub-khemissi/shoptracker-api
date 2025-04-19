@@ -175,6 +175,7 @@ export async function retrieveSubscription(subscriptionId) {
             billing_period: billingPeriod,
             currency: currency,
             trial_end: trialEnd,
+            status: subscription.status,
         };
     } catch (error) {
         Log.error(`@Stripe:retrieveSubscription - Error retrieving subscription details: ${error}`);
