@@ -20,8 +20,7 @@ api.patch("/track/update", async function (req, res) {
         return;
     }
 
-    const { id, trackStock, trackPrice } = req.body;
-    const trackPriceThreshold = req.body.trackPriceThreshold ?? null;
+    const { id, trackStock, trackPrice, trackPriceThreshold } = req.body;
 
     if (!validateNumber(id)) {
         res.status(400).json({ data: null, msg: "Invalid id format." });
