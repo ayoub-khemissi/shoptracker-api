@@ -44,14 +44,15 @@ api.post("/phone/code/generate", async function (req, res) {
     }
 
     const valuesB = [jwt.id];
-    const queryB = "SELECT phone_candidate, updated_at FROM user WHERE id=?";
+    const queryB = "SELECT phone_candidate, verify_phone_code_created_at FROM user WHERE id=?";
     const [resultB] = await Database.execute(queryB, valuesB);
 
-    const { phone_candidate, updated_at } = resultB[0];
+    const { phone_candidate, verify_phone_code_created_at } = resultB[0];
+    const timePassed = Date.now() - (verify_phone_code_created_at || 0);
 
-    const timeLeft = convertMillisecondsToText(codeExpirationTime - (Date.now() - updated_at));
+    if (phone === phone_candidate && timePassed < codeExpirationTime) {
+        const timeLeft = convertMillisecondsToText(codeExpirationTime - timePassed);
 
-    if (Number(phone_candidate) === Number(phone) && Date.now() - updated_at < codeExpirationTime) {
         res.status(429).json({
             data: null,
             msg: `Verify phone code already sent, please check your WhatsApp or wait ${timeLeft}.`,
@@ -61,9 +62,9 @@ api.post("/phone/code/generate", async function (req, res) {
 
     const verifyPhoneCode = generateDigits(verifyPhoneCodeLength);
 
-    const valuesC = [verifyPhoneCode, phone, Date.now(), jwt.id];
+    const valuesC = [verifyPhoneCode, phone, Date.now(), Date.now(), jwt.id];
     const queryC =
-        "UPDATE user SET verify_phone_code=?, phone_candidate=?, updated_at=? WHERE id=?";
+        "UPDATE user SET verify_phone_code=?, phone_candidate=?, verify_phone_code_created_at=?, updated_at=? WHERE id=?";
     await Database.execute(queryC, valuesC);
 
     const textBody = formatBodyForVerifyPhoneCode(verifyPhoneCode);

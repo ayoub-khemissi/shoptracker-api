@@ -55,9 +55,9 @@ api.post("/phone/code/verify", async function (req, res) {
         return;
     }
 
-    const valuesC = [phone_candidate, true, null, null, Date.now(), jwt.id];
+    const valuesC = [phone_candidate, true, null, null, null, Date.now(), jwt.id];
     const queryC =
-        "UPDATE user SET phone=?, alert_sms=?, verify_phone_code=?, phone_candidate=?, updated_at=? WHERE id=?";
+        "UPDATE user SET phone=?, alert_sms=?, verify_phone_code=?, phone_candidate=?, verify_phone_code_created_at=?, updated_at=? WHERE id=?";
     await Database.execute(queryC, valuesC);
 
     res.status(200).json({ data: null, msg: "Verify phone code successfully validated." });
