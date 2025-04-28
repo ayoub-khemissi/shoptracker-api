@@ -1,7 +1,7 @@
 import api from "../Modules/Api.js";
 import { generateDigits } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
-import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
+import { verifyJwt } from "../Modules/Auth.js";
 import Constants from "../Utils/Constants.js";
 import { sendWhatsAppMessage } from "../Modules/Twilio.js";
 import { validatePhone } from "../Modules/DataValidation.js";
@@ -11,7 +11,7 @@ import { convertMillisecondsToText } from "../Utils/TextFormatter.js";
 const { verifyPhoneCodeLength, codeExpirationTime } = Constants;
 
 api.post("/phone/code/generate", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.cookies));
+    const jwt = verifyJwt(req.cookies?.jwt);
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

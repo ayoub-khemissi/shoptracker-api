@@ -1,5 +1,5 @@
 import api from "../Modules/Api.js";
-import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
+import { verifyJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { validateBoolean, validateNumber, validateUrl } from "../Modules/DataValidation.js";
 import { cleanStringData } from "../Modules/DataTransformation.js";
@@ -16,7 +16,7 @@ const {
 } = Constants;
 
 api.post("/track", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.cookies));
+    const jwt = verifyJwt(req.cookies?.jwt);
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

@@ -1,5 +1,5 @@
 import api from "../Modules/Api.js";
-import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
+import { verifyJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import {
     validateBoolean,
@@ -8,7 +8,7 @@ import {
 } from "../Modules/DataValidation.js";
 
 api.patch("/notifications/update/", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.cookies));
+    const jwt = verifyJwt(req.cookies?.jwt);
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

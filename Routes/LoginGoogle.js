@@ -1,5 +1,5 @@
 import api from "../Modules/Api.js";
-import { signAuthJwt } from "../Modules/Auth.js";
+import { signJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { validateEmail } from "../Modules/DataValidation.js";
 import { cleanStringData, clearSensitiveData } from "../Modules/DataTransformation.js";
@@ -89,7 +89,7 @@ api.post("/login/google", async function (req, res) {
     user.subscription.last_subscription_date = last_subscription_date || null;
 
     const data = clearSensitiveData(cloneObject(user));
-    const jwt = signAuthJwt({ email: user.email, id: user.id });
+    const jwt = signJwt({ email: user.email, id: user.id });
 
     res.cookie("jwt", jwt, {
         httpOnly: true,

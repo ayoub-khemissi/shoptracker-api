@@ -1,11 +1,11 @@
 import api from "../Modules/Api.js";
-import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
+import { verifyJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 
 api.patch("/unsubscribe/marketing/email", async function (req, res) {
     const { token } = req.body;
 
-    const jwt = verifyAuthJwt(extractJwt(req.cookies) || token);
+    const jwt = verifyJwt(token || req.cookies?.jwt);
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

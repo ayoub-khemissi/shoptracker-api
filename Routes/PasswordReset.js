@@ -1,11 +1,11 @@
 import api from "../Modules/Api.js";
-import { extractJwt, verifyAuthJwt } from "../Modules/Auth.js";
+import { verifyJwt } from "../Modules/Auth.js";
 import { generateSalt, hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
 import { validatePassword } from "../Modules/DataValidation.js";
 
 api.patch("/password/reset", async function (req, res) {
-    const jwt = verifyAuthJwt(extractJwt(req.cookies));
+    const jwt = verifyJwt(req.cookies?.jwt);
 
     if (!jwt) {
         res.status(401).json({ data: null, msg: "Unauthorized." });

@@ -11,7 +11,7 @@ const { jwtExpirationTime } = Constants;
  * @param {string} authJwt JWT token to verify
  * @return {boolean|object} Decoded payload of the JWT token if valid, otherwise false
  */
-export function verifyAuthJwt(authJwt) {
+export function verifyJwt(authJwt) {
     try {
         return jwt.verify(authJwt, SHOPTRACKER_API_JWT_SECRET);
     } catch (error) {
@@ -25,7 +25,7 @@ export function verifyAuthJwt(authJwt) {
  * @param {object} authPayload Payload to sign into the JWT token
  * @return {string|null} Signed JWT token if successful, otherwise null
  */
-export function signAuthJwt(authPayload) {
+export function signJwt(authPayload) {
     try {
         return jwt.sign(authPayload, SHOPTRACKER_API_JWT_SECRET, {
             algorithm: "HS512",
@@ -34,18 +34,4 @@ export function signAuthJwt(authPayload) {
     } catch (error) {
         return null;
     }
-}
-
-/**
- * Extracts a JWT token from the given cookies object.
- *
- * @param {object} [cookies] Cookies object to extract the JWT token from
- * @return {string|null} The extracted JWT token if found, otherwise null
- */
-export function extractJwt(cookies) {
-    if (!cookies || typeof cookies !== "object" || !cookies.jwt) {
-        return null;
-    }
-
-    return cookies.jwt;
 }

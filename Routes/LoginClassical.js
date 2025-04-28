@@ -1,5 +1,5 @@
 import api from "../Modules/Api.js";
-import { signAuthJwt } from "../Modules/Auth.js";
+import { signJwt } from "../Modules/Auth.js";
 import { hashPassword } from "../Modules/Crypto.js";
 import Database from "../Modules/Database.js";
 import { validateEmail, validatePassword } from "../Modules/DataValidation.js";
@@ -71,7 +71,7 @@ api.post("/login/classical", async function (req, res) {
     user.subscription.first_subscription_date = first_subscription_date || null;
     user.subscription.last_subscription_date = last_subscription_date || null;
 
-    const jwt = signAuthJwt({ email: user.email, id: user.id });
+    const jwt = signJwt({ email: user.email, id: user.id });
     const data = clearSensitiveData(cloneObject(user));
 
     res.cookie("jwt", jwt, {
