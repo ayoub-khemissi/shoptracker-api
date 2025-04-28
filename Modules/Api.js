@@ -27,8 +27,10 @@ api.use(
     cors({
         origin: `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`,
         credentials: true,
-        methods: "GET,PUT,PATCH,POST,DELETE",
-        allowedHeaders: ["Content-Type"],
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+        allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+        exposedHeaders: ["Content-Length", "Authorization"],
+        maxAge: 600,
     }),
 );
 // eslint-disable-next-line
