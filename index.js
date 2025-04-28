@@ -25,3 +25,4 @@ import "./Routes/PhoneCodeGenerate.js";
 import "./Routes/PhoneCodeVerify.js";
 import "./Routes/SubscriptionReactivate.js";
 import "./Routes/Dashboard.js";
+import "./Routes/UnsubscribeMarketingEmail.js";
