@@ -25,6 +25,11 @@ export function clearSensitiveData(data) {
 
     delete data.password_salt;
     delete data.password_hash;
+    delete data.stripe_customer_id;
+    delete data.reset_password_code;
+    delete data.verify_phone_code;
+    delete data.phone_candidate;
+    delete data.verify_phone_code_created_at;
     delete data.disabled;
 
     return data;
