@@ -2,8 +2,8 @@ import api from "../Modules/Api.js";
 import { verifyJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 
-api.patch("/unsubscribe/marketing/email", async function (req, res) {
-    const { token } = req.body;
+api.patch("/update/marketing/email", async function (req, res) {
+    const { token, enabled } = req.body;
 
     const jwt = verifyJwt(token || req.cookies?.jwt);
 
@@ -21,9 +21,9 @@ api.patch("/unsubscribe/marketing/email", async function (req, res) {
         return;
     }
 
-    const values = [false, jwt.id];
-    const query = "UPDATE user SET marketing_email=? WHERE id=?";
+    const values = [enabled, Date.now(), jwt.id];
+    const query = "UPDATE user SET marketing_email=?, updated_at=? WHERE id=?";
     await Database.execute(query, values);
 
-    res.status(200).json({ data: null, msg: "User successfully unsubscribed from marketing emails." });
+    res.status(200).json({ data: null, msg: "User marketing email subscription successfully updated." });
 });
