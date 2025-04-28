@@ -40,6 +40,7 @@ api.post("/register/google", async function (req, res) {
             user.alert_sms = !!user.phone;
             user.alert_browser = !!user.alert_browser_subscription;
             user.alert_push = !!user.alert_push_subscription;
+            user.marketing_email = true;
             user.alert_browser_subscription = null;
             user.alert_push_subscription = null;
 
@@ -49,13 +50,14 @@ api.post("/register/google", async function (req, res) {
                 user.alert_sms,
                 user.alert_browser,
                 user.alert_push,
+                user.marketing_email,
                 user.alert_browser_subscription,
                 user.alert_push_subscription,
                 Date.now(),
                 user.id,
             ];
             const queryB =
-                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
+                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, marketing_email=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         }
 
@@ -98,9 +100,9 @@ api.post("/register/google", async function (req, res) {
         return;
     }
 
-    const valuesB = [email, true, false, false, false, null, null, Date.now()];
+    const valuesB = [email, true, false, false, false, true, null, null, Date.now()];
     const queryB =
-        "INSERT INTO user (email, alert_email, alert_sms, alert_browser, alert_push, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO user (email, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const [resultB] = await Database.execute(queryB, valuesB);
 
     if (resultB.affectedRows === 0) {

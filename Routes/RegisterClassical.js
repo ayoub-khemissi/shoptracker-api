@@ -53,6 +53,7 @@ api.post("/register/classical", async function (req, res) {
             user.alert_sms = !!user.phone;
             user.alert_browser = !!user.alert_browser_subscription;
             user.alert_push = !!user.alert_push_subscription;
+            user.marketing_email = true;
             user.alert_browser_subscription = null;
             user.alert_push_subscription = null;
 
@@ -62,13 +63,14 @@ api.post("/register/classical", async function (req, res) {
                 user.alert_sms,
                 user.alert_browser,
                 user.alert_push,
+                user.marketing_email,
                 user.alert_browser_subscription,
                 user.alert_push_subscription,
                 Date.now(),
                 user.id,
             ];
             const queryB =
-                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
+                "UPDATE user SET disabled=?, alert_email=?, alert_sms=?, alert_browser=?, alert_push=?, marketing_email=?, alert_browser_subscription=?, alert_push_subscription=?, updated_at=? WHERE id=?";
             await Database.execute(queryB, valuesB);
         } else {
             res.status(409).json({ data: null, msg: "User already exists." });
@@ -87,12 +89,13 @@ api.post("/register/classical", async function (req, res) {
         false,
         false,
         false,
+        true,
         null,
         null,
         Date.now(),
     ];
     const queryC =
-        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), created_at=VALUES(created_at)";
+        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), marketing_email=VALUES(marketing_email), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), created_at=VALUES(created_at)";
     const [resultC] = await Database.execute(queryC, valuesC);
 
     if (resultC.affectedRows === 0) {
