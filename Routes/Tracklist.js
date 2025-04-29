@@ -33,13 +33,19 @@ api.get("/tracklist", async function (req, res) {
             "SELECT * FROM (SELECT id, created_at, price, availability FROM (SELECT tco.id, tco.created_at, tco.price, tco.availability FROM track_check_ok tco JOIN (SELECT id, created_at, price, availability, LAG(price) OVER (ORDER BY created_at) AS prev_price, LAG(availability) OVER (ORDER BY created_at) AS prev_availability FROM track_check_ok WHERE created_at >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 6 MONTH)) * 1000 AND track_id = ?) ptco ON tco.id = ptco.id WHERE (tco.price <> ptco.prev_price OR tco.availability <> ptco.prev_availability) AND tco.track_id = ? ORDER BY tco.created_at DESC LIMIT 10) AS limited_changes UNION ALL SELECT first_check.id, first_check.created_at, first_check.price, first_check.availability FROM (SELECT tc_first.id, tc_first.created_at, tc_first.price, tc_first.availability FROM track_check_ok tc_first WHERE tc_first.track_id = ? ORDER BY tc_first.created_at ASC LIMIT 1) first_check UNION ALL SELECT last_check.id, last_check.created_at, last_check.price, last_check.availability FROM (SELECT tc_last.id, tc_last.created_at, tc_last.price, tc_last.availability FROM track_check_ok tc_last WHERE tc_last.track_id = ? ORDER BY tc_last.created_at DESC LIMIT 1) last_check) AS combined_results GROUP BY id, created_at, price, availability ORDER BY created_at ASC";
         const [resultB] = await Database.execute(queryB, valuesB);
 
-        track.track_checks_ok = [...resultB];
+        track.track_checks_chart = [...resultB];
 
         const valuesC = [track.id];
         const queryC =
-            "SELECT tcko.id, tcko.created_at, tckor.title, tckor.reason FROM track_check_ko tcko JOIN track_check_ko_reason tckor ON tcko.reason_id = tckor.id WHERE tcko.track_id = ? ORDER BY tcko.created_at DESC LIMIT 5";
+            "SELECT tco.id, tco.price, tco.availability, tco.created_at FROM track_check_ok tco WHERE tco.track_id = ? ORDER BY tco.created_at DESC LIMIT 5";
         const [resultC] = await Database.execute(queryC, valuesC);
-        track.track_checks_ko = [...resultC];
+        track.track_checks_ok_recent = [...resultC];
+
+        const valuesD = [track.id];
+        const queryD =
+            "SELECT tck.id, tck.created_at, tckor.title, tckor.reason FROM track_check_ko tck JOIN track_check_ko_reason tckor ON tck.reason_id = tckor.id WHERE tck.track_id = ? ORDER BY tck.created_at DESC LIMIT 5";
+        const [resultD] = await Database.execute(queryD, valuesD);
+        track.track_checks_ko_recent = [...resultD];
     }
 
     res.status(200).json({ data: resultA, msg: "Tracklist successfully found." });
