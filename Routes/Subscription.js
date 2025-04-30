@@ -3,7 +3,7 @@ import { verifyJwt } from "../Modules/Auth.js";
 import Database from "../Modules/Database.js";
 import { retrieveSubscription } from "../Modules/Stripe.js";
 import Constants from "../Utils/Constants.js";
-import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
+import { cloneObject, mergeObjects } from "../Modules/ObjectHandler.js";
 
 const { subscriptionActive, defaultSubscriptionDetails } = Constants;
 

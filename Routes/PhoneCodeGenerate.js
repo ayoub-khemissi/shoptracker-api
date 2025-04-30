@@ -6,7 +6,7 @@ import Constants from "../Utils/Constants.js";
 import { sendWhatsAppMessage } from "../Modules/Twilio.js";
 import { validatePhone } from "../Modules/DataValidation.js";
 import { formatBodyForVerifyPhoneCode } from "../Modules/TrackerNotificationsTextFormatter.js";
-import { convertMillisecondsToText } from "../Utils/TextFormatter.js";
+import { convertMillisecondsToText } from "../Modules/TextFormatter.js";
 
 const { verifyPhoneCodeLength, codeExpirationTime } = Constants;
 

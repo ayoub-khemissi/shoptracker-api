@@ -7,7 +7,7 @@ import { verifyGoogleJwt } from "../Modules/GoogleAuth.js";
 import Config from "../Utils/Config.js";
 import Constants from "../Utils/Constants.js";
 import { retrieveSubscription } from "../Modules/Stripe.js";
-import { cloneObject, mergeObjects } from "../Utils/ObjectHandler.js";
+import { cloneObject, mergeObjects } from "../Modules/ObjectHandler.js";
 
 const { SHOPTRACKER_FRONT_HTTPSECURE, SHOPTRACKER_FRONT_DOMAIN, SHOPTRACKER_COOKIES_SAME_SITE } =
     Config;

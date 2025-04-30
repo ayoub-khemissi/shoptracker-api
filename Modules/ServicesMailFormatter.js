@@ -1,6 +1,6 @@
 import fs from "fs";
 import Constants from "../Utils/Constants.js";
-import { convertMillisecondsToText, formatPrice } from "../Utils/TextFormatter.js";
+import { convertMillisecondsToText, formatPrice } from "../Modules/TextFormatter.js";
 import Config from "../Utils/Config.js";
 
 const { mailTemplatesPath } = Constants;
