@@ -178,6 +178,7 @@ export async function retrieveSubscription(subscriptionId) {
         const billingPeriod = subscription.items.data[0].price.recurring.interval;
         const currency = subscription.items.data[0].price.currency;
         const trialEnd = subscription.trial_end * 1000;
+        const status = subscription.status;
         const cancelAtPeriodEnd = subscription.cancel_at_period_end;
         const currentPeriodEnd = subscription.current_period_end * 1000;
 
@@ -189,7 +190,7 @@ export async function retrieveSubscription(subscriptionId) {
             billing_period: billingPeriod,
             currency: currency,
             trial_end: trialEnd,
-            status: subscription.status,
+            status: status,
             cancel_at_period_end: cancelAtPeriodEnd,
             current_period_end: currentPeriodEnd,
         };
