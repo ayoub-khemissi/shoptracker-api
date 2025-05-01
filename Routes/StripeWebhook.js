@@ -120,8 +120,8 @@ api.post("/stripe/webhook", async function (req, res) {
                     return;
                 }
 
-                const valuesB = [subscriptionCanceled, subscription.id];
-                const queryB = "UPDATE subscription SET status_id=? WHERE stripe_subscription_id=?";
+                const valuesB = [subscriptionCanceled, Date.now(), subscription.id];
+                const queryB = "UPDATE subscription SET status_id=?, updated_at=? WHERE stripe_subscription_id=?";
                 await Database.execute(queryB, valuesB);
             }
             break;
