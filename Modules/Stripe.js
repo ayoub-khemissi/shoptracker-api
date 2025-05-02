@@ -17,7 +17,7 @@ const stripe = new Stripe(STRIPE_API_KEY);
 /**
  * Creates a new customer in Stripe.
  * @param {Object} customerData - The data for the new customer.
- * @returns {Promise<Object> | null} The created customer or null if an error occurs.
+ * @returns {Promise<Stripe.Customer> | null} The created customer or null if an error occurs.
  */
 export async function createCustomer(customerData) {
     try {
@@ -34,7 +34,7 @@ export async function createCustomer(customerData) {
  * Cancels a subscription in Stripe.
  * @param {string} subscriptionId - The ID of the subscription to cancel.
  * @param {boolean} cancelAtPeriodEnd - Whether to cancel the subscription at the end of the current period.
- * @returns {Promise<Object> | null} The canceled subscription or null if an error occurs.
+ * @returns {Promise<Stripe.Subscription> | null} The canceled subscription or null if an error occurs.
  */
 export async function cancelSubscription(subscriptionId, cancelAtPeriodEnd = false) {
     try {
@@ -48,7 +48,7 @@ export async function cancelSubscription(subscriptionId, cancelAtPeriodEnd = fal
 /**
  * Reactivates a subscription in Stripe.
  * @param {string} subscriptionId - The ID of the subscription to reactivate.
- * @returns {Promise<Object> | null} The reactivated subscription or null if an error occurs.
+ * @returns {Promise<Stripe.Subscription> | null} The reactivated subscription or null if an error occurs.
  */
 export async function reactivateSubscription(subscriptionId) {
     try {
@@ -64,7 +64,7 @@ export async function reactivateSubscription(subscriptionId) {
  * @param {string} customerId - The ID of the customer.
  * @param {string} priceId - The ID of the price.
  * @param {boolean} isFirstSubscription - Whether this is the user's first subscription.
- * @returns {Promise<Object> | null} The created checkout session or null if an error occurs.
+ * @returns {Promise<Stripe.Checkout.Session> | null} The created checkout session or null if an error occurs.
  */
 export async function createCheckoutSession(customerId, priceId, isFirstSubscription = false) {
     const frontBaseUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
@@ -98,7 +98,7 @@ export async function createCheckoutSession(customerId, priceId, isFirstSubscrip
 /**
  * Retrieves the details of a price from Stripe.
  * @param {string} priceId - The ID of the price to retrieve.
- * @returns {Promise<Object>} The details of the price.
+ * @returns {Promise<Stripe.Price> | null} The details of the price.
  */
 export async function retrievePrice(priceId) {
     try {
@@ -127,7 +127,7 @@ export function constructEvent(body, stripeSignature) {
 /**
  * Retrieves the details of a subscription from Stripe.
  * @param {string} subscriptionId - The ID of the subscription to retrieve.
- * @returns {Promise<Object>} The details of the subscription.
+ * @returns {Promise<Stripe.Subscription> | null} The details of the subscription.
  */
 export async function retrieveSubscription(subscriptionId) {
     try {
