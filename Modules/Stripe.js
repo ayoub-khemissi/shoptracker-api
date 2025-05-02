@@ -70,7 +70,7 @@ export async function createCheckoutSession(customerId, priceId, isFirstSubscrip
     const frontBaseUrl = `http${SHOPTRACKER_FRONT_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_FRONT_HOSTNAME}${SHOPTRACKER_FRONT_HTTPSECURE ? "" : `:${SHOPTRACKER_FRONT_PORT}`}`;
 
     try {
-        const sessionParams = {
+        return await stripe.checkout.sessions.create({
             payment_method_types: ["card", "paypal"],
             line_items: [
                 {
@@ -82,13 +82,9 @@ export async function createCheckoutSession(customerId, priceId, isFirstSubscrip
             success_url: `${frontBaseUrl}/settings?tab=subscription`,
             cancel_url: `${frontBaseUrl}/pricing`,
             customer: customerId,
-        };
-        if (isFirstSubscription) {
-            sessionParams.subscription_data = {
-                trial_period_days: subscriptionTrialPeriodDays,
-            };
-        }
-        return await stripe.checkout.sessions.create(sessionParams);
+            allow_promotion_codes: true,
+            subscription_data: { trial_period_days: isFirstSubscription ? subscriptionTrialPeriodDays : null },
+        });
     } catch (error) {
         Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
         return null;
