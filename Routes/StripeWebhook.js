@@ -126,7 +126,37 @@ api.post("/stripe/webhook", async function (req, res) {
             }
             break;
 
-        case "customer.subscription.updated":
+        case "invoice.paid":
+            {
+                const invoice = event.data.object;
+
+                const valuesA = [invoice.customer];
+                const queryA = "SELECT id, email FROM user WHERE stripe_customer_id=?";
+                const [resultA] = await Database.execute(queryA, valuesA);
+
+                if (resultA.length === 0) {
+                    Log.error(
+                        `/stripe-webhook:invoice.paid - No user found for stripe_customer_id=${invoice.customer}`,
+                    );
+                    res.sendStatus(400);
+                    return;
+                }
+
+                const user = resultA[0];
+
+                const valuesB = [invoice.id, user.id, invoice.amount_paid, invoice.currency, invoice.discount_code, Date.now()];
+                const queryB =
+                    "INSERT INTO invoice (invoice_id, user_id, amount_paid, currency, discount_code, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+                const [resultB] = await Database.execute(queryB, valuesB);
+
+                if (resultB.affectedRows === 0) {
+                    Log.error(
+                        `/stripe-webhook:invoice.paid - Invoice failed to insert in database invoice=${invoice.id} for user=${user.id}-${user.email}`,
+                    );
+                    res.sendStatus(400);
+                    return;
+                }
+            }
             break;
 
         default:
