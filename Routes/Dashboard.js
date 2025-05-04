@@ -151,6 +151,66 @@ api.post("/dashboard", async function (req, res) {
         ORDER BY month;
     `);
 
+    // Evolution of invoices over time (monthly)
+    const [invoicesOverTime] = await Database.query(`
+        SELECT 
+            FROM_UNIXTIME(created_at / 1000, '%Y-%m') AS month,
+            COUNT(*) AS total_invoices
+        FROM invoice
+        GROUP BY month
+        ORDER BY month
+    `);
+
+    // Total number of invoices
+    const [[{ total_invoices }]] = await Database.query(`
+        SELECT COUNT(*) AS total_invoices
+        FROM invoice
+    `);
+
+    // Evolution of invoices by referrer over time (monthly)
+    const [invoicesByReferrerOverTime] = await Database.query(`
+        SELECT 
+            r.name AS referrer_name,
+            FROM_UNIXTIME(i.created_at / 1000, '%Y-%m') AS month,
+            COUNT(*) AS total_invoices
+        FROM invoice i
+        JOIN user u ON u.id=i.user_id
+        JOIN referrer r ON r.id=u.referrer_id
+        GROUP BY referrer_name, month
+        ORDER BY month
+    `);
+
+    // Total amount paid
+    const [[{ total_amount_paid }]] = await Database.query(`
+        SELECT IFNULL(SUM(amount_paid) / 100, 0) AS total_amount_paid
+        FROM invoice
+    `);
+
+    // Total amount paid by referrer
+    const [totalAmountPaidByReferrer] = await Database.query(`
+        SELECT 
+            r.name AS referrer_name,
+            IFNULL(SUM(i.amount_paid) / 100, 0) AS total_amount_paid
+        FROM invoice i
+        JOIN user u ON u.id=i.user_id
+        JOIN referrer r ON r.id=u.referrer_id
+        GROUP BY referrer_name
+        ORDER BY total_amount_paid DESC
+    `);
+
+    // Evolution of amount paid by referrer over time (monthly)
+    const [amountPaidByReferrerOverTime] = await Database.query(`
+        SELECT 
+            r.name AS referrer_name,
+            FROM_UNIXTIME(i.created_at / 1000, '%Y-%m') AS month,
+            IFNULL(SUM(i.amount_paid) / 100, 0) AS total_amount_paid
+        FROM invoice i
+        JOIN user u ON u.id=i.user_id
+        JOIN referrer r ON r.id=u.referrer_id
+        GROUP BY referrer_name, month
+        ORDER BY month
+    `);
+
     // Monthly churn (approximate)
     const [churnOverTime] = await Database.query(`
         SELECT 
@@ -222,6 +282,12 @@ api.post("/dashboard", async function (req, res) {
                 activeSubscriptions,
                 mrr,
                 mrrOverTime,
+                total_invoices,
+                invoicesOverTime,
+                invoicesByReferrerOverTime,
+                total_amount_paid,
+                totalAmountPaidByReferrer,
+                amountPaidByReferrerOverTime,
                 plansDistribution,
                 activePlansDistribution,
                 subscriptionsOverTime,
