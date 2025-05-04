@@ -120,7 +120,7 @@ api.post("/register/classical", async function (req, res) {
         return;
     }
 
-    const user = resultD[0];
+    const user = resultE[0];
 
     const valuesF = [user.id, subscriptionActive];
     const queryF =
