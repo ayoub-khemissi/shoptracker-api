@@ -83,7 +83,7 @@ export async function createCheckoutSession(customerId, priceId, isFirstSubscrip
             cancel_url: `${frontBaseUrl}/pricing`,
             customer: customerId,
             allow_promotion_codes: true,
-            subscription_data: { trial_period_days: isFirstSubscription ? subscriptionTrialPeriodDays : null },
+            subscription_data: { trial_period_days: isFirstSubscription ? subscriptionTrialPeriodDays : undefined },
         });
     } catch (error) {
         Log.error(`@Stripe:createCheckoutSession - Error creating checkout session: ${error}`);
