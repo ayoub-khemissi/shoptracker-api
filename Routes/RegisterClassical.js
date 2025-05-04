@@ -16,6 +16,7 @@ const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Co
 
 api.post("/register/classical", async function (req, res) {
     const { email, password, recaptchaToken } = req.body;
+    const referrerCode = cleanStringData(req.body.referrerCode);
 
     if (!recaptchaToken) {
         res.status(400).json({ data: null, msg: "reCAPTCHA token is required." });
@@ -81,7 +82,13 @@ api.post("/register/classical", async function (req, res) {
     const passwordSalt = generateSalt();
     const passwordHash = hashPassword(cleanPassword, passwordSalt);
 
-    const valuesC = [
+    const valuesC = [referrerCode];
+    const queryC = "SELECT id FROM referrer WHERE code=?";
+    const [resultC] = await Database.execute(queryC, valuesC);
+
+    const referrerId = resultC.length > 0 ? resultC[0].id : null;
+
+    const valuesD = [
         cleanEmail,
         passwordSalt,
         passwordHash,
@@ -92,35 +99,36 @@ api.post("/register/classical", async function (req, res) {
         true,
         null,
         null,
+        referrerId,
         Date.now(),
     ];
-    const queryC =
-        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), marketing_email=VALUES(marketing_email), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), created_at=VALUES(created_at)";
-    const [resultC] = await Database.execute(queryC, valuesC);
+    const queryD =
+        "INSERT INTO user (email, password_salt, password_hash, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, referrer_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_salt=VALUES(password_salt), password_hash=VALUES(password_hash), alert_email=VALUES(alert_email), alert_sms=VALUES(alert_sms), alert_browser=VALUES(alert_browser), alert_push=VALUES(alert_push), marketing_email=VALUES(marketing_email), alert_browser_subscription=VALUES(alert_browser_subscription), alert_push_subscription=VALUES(alert_push_subscription), referrer_id=VALUES(referrer_id), updated_at=VALUES(created_at)";
+    const [resultD] = await Database.execute(queryD, valuesD);
 
-    if (resultC.affectedRows === 0) {
+    if (resultD.affectedRows === 0) {
         res.status(400).json({ data: null, msg: "User not inserted." });
         return;
     }
 
-    const valuesD = [resultC.insertId];
-    const queryD = "SELECT * FROM user WHERE id=?";
-    const [resultD] = await Database.execute(queryD, valuesD);
+    const valuesE = [resultD.insertId];
+    const queryE = "SELECT * FROM user WHERE id=?";
+    const [resultE] = await Database.execute(queryE, valuesE);
 
-    if (resultD.length === 0) {
+    if (resultE.length === 0) {
         res.status(404).json({ data: null, msg: "User not found." });
         return;
     }
 
     const user = resultD[0];
 
-    const valuesE = [user.id, subscriptionActive];
-    const queryE =
+    const valuesF = [user.id, subscriptionActive];
+    const queryF =
         "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
-    const [resultE] = await Database.execute(queryE, valuesE);
+    const [resultF] = await Database.execute(queryF, valuesF);
 
-    if (resultE.length > 0) {
-        user.subscription = resultE[0];
+    if (resultF.length > 0) {
+        user.subscription = resultF[0];
 
         const subscriptionDetails = await retrieveSubscription(
             user.subscription.stripe_subscription_id,

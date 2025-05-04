@@ -16,6 +16,7 @@ const { jwtExpirationTime, subscriptionActive, defaultSubscriptionDetails } = Co
 api.post("/register/google", async function (req, res) {
     const email = cleanStringData(req.body.email);
     const googleJwt = cleanStringData(req.body.googleJwt);
+    const referrerCode = cleanStringData(req.body.referrerCode);
 
     if (!validateEmail(email)) {
         res.status(400).json({ data: null, msg: "Invalid email format." });
@@ -100,34 +101,40 @@ api.post("/register/google", async function (req, res) {
         return;
     }
 
-    const valuesB = [email, true, false, false, false, true, null, null, Date.now()];
-    const queryB =
-        "INSERT INTO user (email, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const valuesB = [referrerCode];
+    const queryB = "SELECT id FROM referrer WHERE code=?";
     const [resultB] = await Database.execute(queryB, valuesB);
 
-    if (resultB.affectedRows === 0) {
+    const referrerId = resultB.length > 0 ? resultB[0].id : null;
+
+    const valuesC = [email, true, false, false, false, true, null, null, referrerId, Date.now()];
+    const queryC =
+        "INSERT INTO user (email, alert_email, alert_sms, alert_browser, alert_push, marketing_email, alert_browser_subscription, alert_push_subscription, referrer_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const [resultC] = await Database.execute(queryC, valuesC);
+
+    if (resultC.affectedRows === 0) {
         res.status(400).json({ data: null, msg: "User not inserted." });
         return;
     }
 
-    const valuesC = [resultB.insertId];
-    const queryC = "SELECT * FROM user WHERE id = ?";
-    const [resultC] = await Database.execute(queryC, valuesC);
+    const valuesD = [resultC.insertId];
+    const queryD = "SELECT * FROM user WHERE id = ?";
+    const [resultD] = await Database.execute(queryD, valuesD);
 
-    if (resultC.length === 0) {
+    if (resultD.length === 0) {
         res.status(404).json({ data: null, msg: "User not found." });
         return;
     }
 
-    const user = resultC[0];
+    const user = resultD[0];
 
-    const valuesD = [user.id, subscriptionActive];
-    const queryD =
+    const valuesE = [user.id, subscriptionActive];
+    const queryE =
         "SELECT p.stripe_price_id, s.stripe_subscription_id FROM subscription s, plan p WHERE s.user_id=? AND s.status_id=? AND s.plan_id=p.id";
-    const [resultD] = await Database.execute(queryD, valuesD);
+    const [resultE] = await Database.execute(queryE, valuesE);
 
-    if (resultD.length > 0) {
-        user.subscription = resultB[0];
+    if (resultE.length > 0) {
+        user.subscription = resultE[0];
 
         const subscriptionDetails = await retrieveSubscription(
             user.subscription.stripe_subscription_id,
@@ -137,12 +144,12 @@ api.post("/register/google", async function (req, res) {
         user.subscription = cloneObject(defaultSubscriptionDetails);
     }
 
-    const valuesE = [user.id];
-    const queryE =
+    const valuesF = [user.id];
+    const queryF =
         "SELECT MIN(created_at) AS first_subscription_date, MAX(created_at) AS last_subscription_date FROM subscription WHERE user_id=?";
-    const [resultE] = await Database.execute(queryE, valuesE);
+    const [resultF] = await Database.execute(queryF, valuesF);
 
-    const { first_subscription_date, last_subscription_date } = resultE[0];
+    const { first_subscription_date, last_subscription_date } = resultF[0];
     user.subscription.first_subscription_date = first_subscription_date || null;
     user.subscription.last_subscription_date = last_subscription_date || null;
 
