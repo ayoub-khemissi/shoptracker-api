@@ -2,16 +2,12 @@ import consoleStamp from "console-stamp";
 import express from "express";
 import { readFileSync } from "fs";
 import Config from "../Utils/Config.js";
-import Log from "./Log.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
 consoleStamp(console, { format: ":date(yyyy-mm-dd HH:MM:ss.l):label" });
 
 const {
-    SHOPTRACKER_API_HTTPSECURE,
-    SHOPTRACKER_API_HOSTNAME,
-    SHOPTRACKER_API_PORT,
     SHOPTRACKER_FRONT_HOSTNAME,
     SHOPTRACKER_FRONT_HTTPSECURE,
     SHOPTRACKER_FRONT_PORT,
@@ -32,19 +28,6 @@ api.use(
         maxAge: 3600,
     }),
 );
-// eslint-disable-next-line
-api.use((err, req, res, next) => {
-    const originalUrl = req?.originalUrl || "";
-    const errorMessage = err?.message || "";
-    const msg = `Internal server error - ${originalUrl} - ${errorMessage}`;
-
-    Log.error(msg);
-
-    res.status(err.status || 500).json({
-        data: null,
-        msg: msg,
-    });
-});
 api.disable("x-powered-by");
 
 api.get("/", function (req, res) {
@@ -52,12 +35,6 @@ api.get("/", function (req, res) {
         data: { description: description, version: version },
         msg: "The API is up!",
     });
-});
-
-api.listen(SHOPTRACKER_API_PORT, SHOPTRACKER_API_HOSTNAME, async function () {
-    Log.info(
-        `API listening on http${SHOPTRACKER_API_HTTPSECURE ? "s" : ""}://${SHOPTRACKER_API_HOSTNAME}:${SHOPTRACKER_API_PORT}/.`,
-    );
 });
 
 export default api;
