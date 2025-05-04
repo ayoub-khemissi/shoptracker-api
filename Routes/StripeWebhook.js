@@ -144,9 +144,9 @@ api.post("/stripe/webhook", async function (req, res) {
 
                 const user = resultA[0];
 
-                const valuesB = [invoice.id, user.id, invoice.amount_paid, invoice.currency, invoice.discount_code, Date.now()];
+                const valuesB = [invoice.id, user.id, invoice.subscription, invoice.amount_paid, invoice.currency, invoice.discount_code || null, Date.now()];
                 const queryB =
-                    "INSERT INTO invoice (invoice_id, user_id, amount_paid, currency, discount_code, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+                    "INSERT INTO invoice (invoice_id, user_id, stripe_subscription_id, amount_paid, currency, discount_code, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 const [resultB] = await Database.execute(queryB, valuesB);
 
                 if (resultB.affectedRows === 0) {
